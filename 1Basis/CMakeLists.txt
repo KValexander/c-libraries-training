@@ -7,6 +7,7 @@ project(main)
 # Этот CMakeLists написан на основе:
 # https://github.com/tsoding/nothing/blob/master/CMakeLists.txt
 # https://github.com/bradharding/doomretro/blob/master/CMakeLists.txt
+# https://github.com/satayyeb/sdl2-libraries
 
 # Только для WINDOWS
 
@@ -36,20 +37,29 @@ endif()
 set(SDL2_INCLUDE_DIRS "${SDL2_PATH}/include/SDL2")
 set(SDL2_LIBRARIES "${SDL2_PATH}/lib/libSDL2.a;${SDL2_PATH}/lib/libSDL2main.a;${SDL2_PATH}/lib/libSDL2_image.a;${SDL2_PATH}/lib/libSDL2_mixer.a;${SDL2_PATH}/lib/libSDL2_ttf.a")
 
+# Библиотеки, без которых происходят проблемы при сборке
+# Загружать после загрузки библиотек SDL2
+set(SUPPORT_LIBS
+    Rpcrt4.lib 
+)
+
 # Подключение папки src, SDL2
 include_directories(
     ${CMAKE_SOURCE_DIR}/src
     ${SDL2_INCLUDE_DIRS}
 )
 
+# Получение всех исполняемых файлов
+file(GLOB_RECURSE SOURCE "src/*.c" "src/*.h")
 # Исполняемые файлы
 add_executable(main
-    src/main.c
+    ${SOURCE}
 )
 
 # Подключение библиотеки SDL2
 target_link_libraries(main
-    ${SDL2_LIBRARIES}
+    ${SDL2_LIBRARIES} # первым
+    ${SUPPORT_LIBS} # вторым
 )
 
 # Перенос ресурсов

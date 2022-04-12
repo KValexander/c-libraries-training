@@ -2,55 +2,12 @@
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
-// Внешние библиотеки
-#include <SDL.h>
-#include <SDL_image.h>
+// Заголовки
+#include "main.h"
+#include "status.h"
 
 // Константы
 #define GRAVITY 0.35f
-
-// Структура Текстуры
-typedef struct {
-    SDL_Texture *player_frames[2];
-    SDL_Texture *ledge;
-    SDL_Texture *star;
-} Textures;
-
-// Структура Игрок
-typedef struct {
-    float x, y;     // позиция
-    int w, h;       // ширина и высота
-    float dx, dy;   // скорость
-    short life;     // очки жизни
-    char *name;     // имя
-    int on_ledge;   // проверка коллизии
-    int anim_frame; // фреймы анимации
-    int facing_left; // поворот игрока
-    int slowing_down; // замедление
-} Player;
-
-// Структура Звезда
-typedef struct Star{
-    int x, y;
-} Star;
-
-// Структура Уступ
-typedef struct {
-    int x, y, w, h;
-} Ledge;
-
-// Структура Состояние игры
-typedef struct {
-    Textures textures;  // структура Текстуры
-    
-    Player player;      // структура Игрок
-    Star stars[100];    // массив структур Звезда
-    Ledge ledges[100];  // массив структур Уступ
-
-    int time; // время
-
-    SDL_Renderer *rndr; // визуализатор
-} GameState;
 
 // Загрузка игры
 void load_game(GameState *game) {
@@ -77,6 +34,15 @@ void load_game(GameState *game) {
     game->textures.player_frames[1] = SDL_CreateTextureFromSurface(game->rndr, surface);
     SDL_FreeSurface(surface); // очистка поверхности
 
+    // Загрузка шрифта
+    game->font = TTF_OpenFont("assets/invasion2000.ttf", 48);
+    if(!game->font) printf("Font not found");
+    game->label_w = 0;
+    game->label_h = 0;
+
+    // Инициализация надписи
+    game->textures.label = NULL;
+
     // Инициализация игрока
     game->player.x = 320-24;
     game->player.y = 240-24;
@@ -88,7 +54,11 @@ void load_game(GameState *game) {
     game->player.anim_frame = 0;
     game->player.facing_left = 0;
 
+    // Инициализация состояния
+    init_status_lives(game);
+
     game->time = 0;
+    game->status = STATUS_LIVES;
 
     // Инициализация звёзд
     for(int i = 0; i < 100; i++) {
@@ -135,7 +105,6 @@ int game_events(GameState *game) {
         }
     }
 
-
     // Обработка нажатий на клавиши
     const Uint8 *state = SDL_GetKeyboardState(NULL);
     
@@ -181,21 +150,31 @@ void game_update(GameState *game) {
     // Добавление времени
     game->time++;
 
-    // Передвижение игрока
-    Player *player = &game->player;
-    player->x += player->dx;
-    player->y += player->dy;
-
-    if(player->dx != 0 && player->on_ledge && !player->slowing_down) {
-        if(game->time % 10 == 0) {
-            if(player->anim_frame == 0)
-                player->anim_frame = 1;
-            else player->anim_frame = 0;
-        }
+    // Состояние экрана загрузки
+    if(game->time > 120) {
+        shutdown_status_lives(game);
+        // Переключение в состояние игры
+        game->status = STATUS_GAME;
     }
 
-    // Гравитация
-    player->dy += GRAVITY;
+    // Состояние игры
+    if(game->status != STATUS_LIVES) {
+        // Передвижение игрока
+        Player *player = &game->player;
+        player->x += player->dx;
+        player->y += player->dy;
+
+        if(player->dx != 0 && player->on_ledge && !player->slowing_down) {
+            if(game->time % 10 == 0) {
+                if(player->anim_frame == 0)
+                    player->anim_frame = 1;
+                else player->anim_frame = 0;
+            }
+        }
+
+        // Гравитация
+        player->dy += GRAVITY;
+    }
 }
 
 // Обработка коллизий
@@ -270,48 +249,54 @@ void game_collision(GameState *game) {
 
 
 // Отрисовка
-int game_render(GameState *game) {
+void game_render(GameState *game) {
 
-    // Задать цвет отрисовки (серый)
-    SDL_SetRenderDrawColor(game->rndr, 150, 150, 150, 255);
+    // Загрузочный экран
+    if(game->status == STATUS_LIVES)
+        draw_status_lives(game);
+    
+    // Экран игры
+    else if(game->status == STATUS_GAME) {
+        // Задать цвет отрисовки (серый)
+        SDL_SetRenderDrawColor(game->rndr, 150, 150, 150, 255);
 
-    // Очистка экрана (из-за цвета отрисовки будет серым)
-    SDL_RenderClear(game->rndr);
+        // Очистка экрана (из-за цвета отрисовки будет серым)
+        SDL_RenderClear(game->rndr);
 
-    // Задать цвет отрисовки (белый)
-    SDL_SetRenderDrawColor(game->rndr, 255, 255, 255, 255);
+        // Задать цвет отрисовки (белый)
+        SDL_SetRenderDrawColor(game->rndr, 255, 255, 255, 255);
 
-    // Создание и отрисовка уступов
-    for(int i = 0; i < 100; i++) {
-        SDL_Rect ledge_rect = {game->ledges[i].x, game->ledges[i].y, game->ledges[i].w, game->ledges[i].h};
-        SDL_RenderCopy(game->rndr, game->textures.ledge, NULL, &ledge_rect); // отрисовка текстуры
+        // Создание и отрисовка уступов
+        for(int i = 0; i < 100; i++) {
+            SDL_Rect ledge_rect = {game->ledges[i].x, game->ledges[i].y, game->ledges[i].w, game->ledges[i].h};
+            SDL_RenderCopy(game->rndr, game->textures.ledge, NULL, &ledge_rect); // отрисовка текстуры
+        }
+
+        // Создание и отрисовка текстуры игрока
+        SDL_Rect player_rect = {game->player.x, game->player.y, game->player.w, game->player.h};
+        // SDL_RenderFillRect(game->rndr, &rect); // отрисовка прямоугольника
+        // SDL_RenderCopy(game->rndr, game->textures.player_frames[0], NULL, &player_rect); // отрисовка текстуры
+        SDL_RenderCopyEx(
+            game->rndr,
+            // game->textures.player_frames[0],
+            game->textures.player_frames[game->player.anim_frame],
+            NULL,
+            &player_rect,
+            0,
+            NULL,
+            game->player.facing_left
+        ); // отрисовка текстуры
+
+        // Создание и отрисовка звёзд
+        // for(int i = 0; i < 100; i++) {
+        //     SDL_Rect star_rect = {game->stars[i].x, game->stars[i].y, 32, 32};  // создание прямоугольника
+        //     SDL_RenderCopy(game->rndr, game->textures.star, NULL, &star_rect); // отрисовка текстуры
+        // }
     }
 
-    // Создание и отрисовка текстуры игрока
-    SDL_Rect player_rect = {game->player.x, game->player.y, game->player.w, game->player.h};
-    // SDL_RenderFillRect(game->rndr, &rect); // отрисовка прямоугольника
-    // SDL_RenderCopy(game->rndr, game->textures.player_frames[0], NULL, &player_rect); // отрисовка текстуры
-    SDL_RenderCopyEx(
-        game->rndr,
-        // game->textures.player_frames[0],
-        game->textures.player_frames[game->player.anim_frame],
-        NULL,
-        &player_rect,
-        0,
-        NULL,
-        game->player.facing_left
-    ); // отрисовка текстуры
-
-    // Создание и отрисовка звёзд
-    // for(int i = 0; i < 100; i++) {
-    //     SDL_Rect star_rect = {game->stars[i].x, game->stars[i].y, 32, 32};  // создание прямоугольника
-    //     SDL_RenderCopy(game->rndr, game->textures.star, NULL, &star_rect); // отрисовка текстуры
-    // }
 
     // Отрисовка объектов на окне
     SDL_RenderPresent(game->rndr);
-
-    return 0;
 }
 
 // Старт
@@ -329,6 +314,7 @@ int main(int argc, char *argv[]) {
 
     // Инициализация 
     SDL_Init(SDL_INIT_VIDEO); // SDL2
+    TTF_Init(); // SDL2_ttf
     srand((int)time(NULL)); // случайные числа
 
     // Создание окна
@@ -369,12 +355,18 @@ int main(int argc, char *argv[]) {
     SDL_DestroyTexture(game.textures.player_frames[1]);
     SDL_DestroyTexture(game.textures.ledge);
     SDL_DestroyTexture(game.textures.star);
+    if (game.textures.label != NULL)
+        SDL_DestroyTexture(game.textures.label);
+    // Закрытие шрифта
+    TTF_CloseFont(game.font);
 
     // Закрытие и уничтожение окна
     SDL_DestroyWindow(window);
     // Закрытие и уничтожение визуализатора
     SDL_DestroyRenderer(game.rndr);
 
+    // Выход из SDL2_ttf
+    TTF_Quit();
     // Выход из SDL2
     SDL_Quit();
 
