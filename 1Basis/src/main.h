@@ -23,7 +23,7 @@ typedef struct {
     float x, y;     // позиция
     int w, h;       // ширина и высота
     float dx, dy;   // скорость
-    short life;     // очки жизни
+    short lives;    // количество жизней
     char *name;     // имя
     int on_ledge;   // проверка коллизии
     int anim_frame; // фреймы анимации

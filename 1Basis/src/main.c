@@ -35,7 +35,7 @@ void load_game(GameState *game) {
     SDL_FreeSurface(surface); // очистка поверхности
 
     // Загрузка шрифта
-    game->font = TTF_OpenFont("assets/invasion2000.ttf", 48);
+    game->font = TTF_OpenFont("assets/invasion2000.ttf", 36);
     if(!game->font) printf("Font not found");
     game->label_w = 0;
     game->label_h = 0;
@@ -50,6 +50,7 @@ void load_game(GameState *game) {
     game->player.h = 48;
     game->player.dx = 0;
     game->player.dy = 0;
+    game->player.lives = 3;
     game->player.on_ledge = 0;
     game->player.anim_frame = 0;
     game->player.facing_left = 0;
@@ -278,7 +279,6 @@ void game_render(GameState *game) {
         // SDL_RenderCopy(game->rndr, game->textures.player_frames[0], NULL, &player_rect); // отрисовка текстуры
         SDL_RenderCopyEx(
             game->rndr,
-            // game->textures.player_frames[0],
             game->textures.player_frames[game->player.anim_frame],
             NULL,
             &player_rect,

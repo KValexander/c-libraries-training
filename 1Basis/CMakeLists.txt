@@ -40,7 +40,7 @@ set(SDL2_LIBRARIES "${SDL2_PATH}/lib/libSDL2.a;${SDL2_PATH}/lib/libSDL2main.a;${
 # Библиотеки, без которых происходят проблемы при сборке
 # Загружать после загрузки библиотек SDL2
 set(SUPPORT_LIBS
-    Rpcrt4.lib 
+    Rpcrt4.lib
 )
 
 # Подключение папки src, SDL2
