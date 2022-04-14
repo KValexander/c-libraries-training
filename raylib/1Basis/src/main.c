@@ -8,6 +8,27 @@
 // Подключение заголовков
 #include <main.h>
 
+/* Загрузка текстуры */
+void load_texture(Texture2D *texture, char src[], int w, int h) {
+    Image image = LoadImage(src); // загрузка изображения
+    ImageResize(&image, w, h); // изменение размеров
+    *texture = LoadTextureFromImage(image); // загрузка текстуры
+    UnloadImage(image); // выгрузка изображения
+}
+
+/* Новая жизнь */
+void init_reset(Game *game) {
+    sprintf(game->labels[0].text, "x %d", game->player.lives);
+    game->current_screen = SCREEN_LIVES;
+
+    game->player.rect.x = 100;
+    game->player.rect.y = 100;
+    game->player.dx = 0;
+    game->player.dy = 0;
+    game->player.is_dead = 0;
+    game->player.on_platform = 0;
+} 
+
 /* Инициализация */
 void init(Game *game) {
 
@@ -19,31 +40,27 @@ void init(Game *game) {
     srand(time(0));
 
     /* Инициализация текстур */
-    Image image;
+    load_texture(&game->textures.fire, "assets/fire.png", 64, 64); // огонь
+    load_texture(&game->textures.star, "assets/star.png", 64, 64); // звезда
+    load_texture(&game->textures.player[0], "assets/one.png", 48, 48); // игрок
+    load_texture(&game->textures.player[1], "assets/two.png", 48, 48); // игрок
+    load_texture(&game->textures.platform, "assets/platform.png", 256, 64); // платформа
 
-    /* Огонь */
-    image = LoadImage("assets/fire.png"); // загрузка изображения
-    ImageResize(&image, 64, 64); // изменение размеров
-    game->textures.fire = LoadTextureFromImage(image); // загрузка текстуры
-    UnloadImage(image); // выгрузка изображения
+    /* Инициализация шрифта */
+    game->font = LoadFont("assets/invasion2000.ttf");
 
-    /* Звезда */
-    image = LoadImage("assets/star.png"); // загрузка изображения
-    ImageResize(&image, 64, 64); // изменение размеров
-    game->textures.star = LoadTextureFromImage(image); // загрузка текстуры
-    UnloadImage(image); // выгрузка изображения
+    /* Инициализация надписей */
+    /* Надпись на экране состояния жизни */ 
+    sprintf(game->labels[0].text, "x %d", 3);
+    game->labels[0].size = MeasureTextEx(game->font, game->labels[0].text, 36, 2);
+    game->labels[0].pos.x = SCREEN_WIDTH / 2 - game->labels[0].size.x / 2 + 50;
+    game->labels[0].pos.y = SCREEN_HEIGHT / 2 - game->labels[0].size.y / 2;
 
-    /* Игрок */
-    image = LoadImage("assets/star.png"); // загрузка изображения
-    ImageResize(&image, 48, 48); // изменение размеров
-    game->textures.player = LoadTextureFromImage(image); // загрузка текстуры
-    UnloadImage(image); // выгрузка изображения
-
-    /* Платформа */ 
-    image = LoadImage("assets/platform.png"); // загрузка изображения
-    ImageResize(&image, 256, 64); // изменение размеров
-    game->textures.platform = LoadTextureFromImage(image); // загрузка текстуры
-    UnloadImage(image); // выгрузка изображения
+    /* Надпись на экране окончания игры */
+    sprintf(game->labels[1].text, "Game over");
+    game->labels[1].size = MeasureTextEx(game->font, game->labels[1].text, 48, 2);
+    game->labels[1].pos.x = SCREEN_WIDTH / 2 - game->labels[1].size.x / 2;
+    game->labels[1].pos.y = SCREEN_HEIGHT / 2 - game->labels[1].size.y / 2;
 
     /* Инициализация игрока */
     game->player.rect.w = 48;
@@ -52,16 +69,21 @@ void init(Game *game) {
     game->player.rect.y = 100;
     game->player.dx = 0;
     game->player.dy = 0;
+    game->player.lives = 3;
     game->player.is_dead = 0;
     game->player.on_platform = 0;
+    game->player.current_frame = 0;
 
     /* Инициализация камеры */
     game->camera.x = 0;
     game->camera.y = 0;
 
     /* Инициализация прочего */
-    game->frame = 0;
-    game->current_screen = SCREEN_GAME;
+    game->frame = 0; // время
+    game->death_countdown = -1; // счётчик смерти
+
+    /* Инициализация экранов */ 
+    game->current_screen = SCREEN_LIVES;
 
     /* Инициализация звёзд */
     for (int i = 0; i < NUM_STARS; i++) {
@@ -84,8 +106,13 @@ void init(Game *game) {
 /* Обработка событий */
 void events(Game *game) {
 
+    /* Рестарт */
+    if(IsKeyDown(KEY_R))
+        init_reset(game);
+
     /* Прыжок */
     if(IsKeyDown(KEY_UP)) {
+        game->player.current_frame = 1;
         if(game->player.on_platform) {
             game->player.dy = -8;
             game->player.on_platform = 0;
@@ -108,6 +135,7 @@ void events(Game *game) {
 
     /* Остановка движения */ 
     else {
+        game->player.current_frame = 0;
         game->player.dx *= 0.8f;
         if(fabsf(game->player.dx) < 0.1f)
             game->player.dx = 0;
@@ -115,36 +143,88 @@ void events(Game *game) {
 
 }
 
+/* Обновление данных экрана состояния жизни */
+void update_lives(Game *game) {}
+
+/* Обновление данных экрана игры */
+void update_game(Game *game) {
+
+    /* Если игрок жив */
+    if(!game->player.is_dead) {
+
+        /* Передвижение игрока */
+        Player *player = &game->player;
+        player->rect.x += player->dx;
+        player->rect.y += player->dy;
+
+        /* Анимация игрока */
+        if(player->dx != 0 && player->on_platform)
+            if(game->frame % 10 == 0)
+                player->current_frame = !player->current_frame;
+
+        player->dy += GRAVITY; // гравитация
+
+    }
+
+    /* Если игрок мёртв */
+    if(game->player.is_dead && game->death_countdown < 0)
+        game->death_countdown = 120;
+
+    /* Обратный отсчёт смерти */ 
+    if(game->death_countdown >= 0) {
+        game->death_countdown--;
+        if(game->death_countdown < 0) {
+
+            /* Смерть игрока */
+            game->player.lives--;
+            game->frame = 0;
+
+            /* Если у игрока остались жизни */ 
+            if(game->player.lives >= 0)
+                init_reset(game);
+
+            /* Окончательная смерть */
+            else game->current_screen = SCREEN_GAMEOVER;
+
+        }
+    }
+
+}
+
+/* Обновление данных экрана окончания игры */
+void update_game_over(Game *game) {}
+
 /* Обновление данных */
 void update(Game *game) {
     game->frame++; // счётчик времени
 
+    /* Время экрана загрузки */ 
+    if(game->frame > 120 && game->current_screen != SCREEN_GAMEOVER)
+        game->current_screen = SCREEN_GAME;
+
     /* Распределение экранов */ 
     switch(game->current_screen) {
 
-        /* Экран количества жизней */
-        case SCREEN_LIVES: break;
+        /* Экран состояния жизни */
+        case SCREEN_LIVES:
+
+            update_lives(game);
+
+        break;
 
         /* Экран игры */
         case SCREEN_GAME:
 
-            /* Если игрок жив */
-            if(!game->player.is_dead) {
-
-                /* Передвижение игрока */
-                Player *player = &game->player;
-                player->rect.x += player->dx;
-                player->rect.y += player->dy;
-
-                player->dy += GRAVITY; // гравитация
-
-            }
-
+            update_game(game);
 
         break;
 
-        /* Экран проигрыша */ 
-        case SCREEN_GAMEOVER: break;
+        /* Экран окончаения игры */ 
+        case SCREEN_GAMEOVER:
+
+            update_game_over(game);
+
+        break;
 
         default: break;
     }
@@ -223,66 +303,117 @@ void collisions(Game *game) {
                 game->player.dx = 0;
             }
         }
+        
     }
+
+}
+
+/* Отрисовка экрана состояния жизни */
+void render_lives(Game *game) {
+
+    /* Отрисовка игрока */
+    DrawTexture(
+        game->textures.player[0],
+        SCREEN_WIDTH / 2 - game->player.rect.w /2 - 20,
+        SCREEN_HEIGHT / 2 - game->player.rect.h / 2,
+        WHITE // зачем?
+    );
+
+    /* Отрисовка текста */
+    DrawTextEx(
+        game->font,
+        game->labels[0].text,
+        game->labels[0].pos,
+        36,
+        2,
+        WHITE
+    );
+
+}
+
+/* Отрисовка экрана игры */
+void render_game(Game *game) {
+    ClearBackground(SKYBLUE); // задний фон
+
+    /* Отрисовка игрока */
+    DrawTexture(
+        game->textures.player[game->player.current_frame],
+        game->camera.x + game->player.rect.x,
+        game->player.rect.y,
+        WHITE // зачем?
+    );
+
+    /* Отрисовка огня в случае смерти игрока */
+    if(game->player.is_dead)
+        DrawTexture(
+            game->textures.fire,
+            game->camera.x+game->player.rect.x - 6,
+            game->player.rect.y - 6,
+            WHITE // зачем?
+        );
+
+    /* Отрисовка Звёзд */
+    for(int i = 0; i < NUM_STARS; i++)
+        DrawTexture(
+            game->textures.star,
+            game->camera.x + game->stars[i].x,
+            game->stars[i].y,
+            WHITE // зачем?
+        );
+
+    /* Отрисовка платформ */
+    for(int i = 0; i < NUM_PLATFORMS; i++)
+        DrawTexture(
+            game->textures.platform,
+            game->camera.x + game->platforms[i].x,
+            game->platforms[i].y,
+            WHITE // зачем?
+        );
+
+}
+
+/* Отрисовка экрана окончания игры */
+void render_game_over(Game *game) {
+
+    /* Отрисовка текста */
+    DrawTextEx(
+        game->font,
+        game->labels[1].text,
+        game->labels[1].pos,
+        48,
+        2,
+        WHITE
+    );
 
 }
 
 /* Отрисовка */
 void render(Game *game) {
-    ClearBackground(SKYBLUE); // задний фон
+    ClearBackground(BLACK); // задний фон
 
     /* Распределение экранов */ 
     switch(game->current_screen) {
 
         /* Экран количества жизней */
-        case SCREEN_LIVES: break;
+        case SCREEN_LIVES:
+
+            render_lives(game);
+
+        break;
 
         /* Экран игры */
         case SCREEN_GAME:
 
-            /* Отрисовка игрока */
-            DrawRectangle(
-                game->camera.x+game->player.rect.x,
-                game->player.rect.y,
-                game->player.rect.w,
-                game->player.rect.h,
-                BLUE
-            );
-
-            /* Отрисовка огня в случае смерти игрока */
-            if(game->player.is_dead) {
-                Vector2 xy = {game->camera.x+game->player.rect.x - 6, game->player.rect.y - 6};
-                DrawTextureEx(
-                    game->textures.fire,
-                    xy,
-                    0,
-                    1,
-                    WHITE
-                );
-            }
-
-            /* Отрисовка Звёзд */
-            for(int i = 0; i < NUM_STARS; i++)
-                DrawTexture(
-                    game->textures.star,
-                    game->camera.x + game->stars[i].x,
-                    game->stars[i].y,
-                    WHITE // зачем?
-                );
-
-            /* Отрисовка платформ */
-            for(int i = 0; i < NUM_PLATFORMS; i++)
-                DrawTexture(
-                    game->textures.platform,
-                    game->camera.x + game->platforms[i].x,
-                    game->platforms[i].y,
-                    WHITE // зачем?
-                );
+            render_game(game);
 
         break;
 
         /* Экран проигрыша */ 
-        case SCREEN_GAMEOVER: break;
+        case SCREEN_GAMEOVER:
+
+            render_game_over(game);
+
+        break;
 
         default: break;
     }
@@ -317,9 +448,14 @@ void loop(Game *game) {
 void deinit(Game *game) {
 
     /* Выгрузка текстур */
+    UnloadTexture(game->textures.fire);
     UnloadTexture(game->textures.star);
-    UnloadTexture(game->textures.player);
+    UnloadTexture(game->textures.player[0]);
+    UnloadTexture(game->textures.player[1]);
     UnloadTexture(game->textures.platform);
+
+    /* Выгрузка шрифтов */
+    UnloadFont(game->font);
 
     /* Закрытие окна */
     CloseWindow();
