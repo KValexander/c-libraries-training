@@ -7,6 +7,7 @@
 #define SCREEN_HEIGHT 480
 #define FPS 60 // FPS
 
+#define LENGTH 38400 // длинна карты
 #define GRAVITY 0.35f // гравитация
 
 #define NUM_STARS 100 // кол-во звёзд
@@ -16,7 +17,8 @@
 typedef enum {
 	SCREEN_LIVES=0,
 	SCREEN_GAME,
-	SCREEN_GAMEOVER
+	SCREEN_GAMEOVER,
+	SCREEN_WIN,
 } GameScreen;
 
 // Структура Текстуры
@@ -44,6 +46,14 @@ typedef struct {
 	char text[128];
 } Label;
 
+// Структура Индикатор
+typedef struct {
+	Rectangle rect;
+	float unit;
+	float dist;
+	float percents;
+} ProgressBar;
+
 // Структура Игрок
 typedef struct {
 	Rect rect; // данные
@@ -59,6 +69,7 @@ typedef struct {
 	Textures textures; // структура Текстуры
 	Player player; // структура Игрок
 	Position camera; // структура Камера
+	ProgressBar progress_bar; // структура Индикатор
 
 	Font font; // шрифт
 
@@ -67,7 +78,7 @@ typedef struct {
 
 	GameScreen current_screen; // игровые экраны
 
-	Label labels[2]; // массив надписей
+	Label labels[3]; // массив надписей
 
 	int frame; // время
 	int death_countdown; // отсчёт смерти
@@ -84,6 +95,7 @@ extern void events(Game *game);
 extern void update_lives(Game *game);
 extern void update_game(Game *game);
 extern void update_game_over(Game *game);
+extern void update_win(Game *game);
 extern void update(Game *game);
 
 extern void collisions(Game *game);
@@ -91,8 +103,10 @@ extern void collisions(Game *game);
 extern void render_lives(Game *game);
 extern void render_game(Game *game);
 extern void render_game_over(Game *game);
+extern void render_win(Game *game);
 extern void render(Game *game);
 
+extern void loop(Game *game);
 extern void deinit(Game *game);
 
 #endif

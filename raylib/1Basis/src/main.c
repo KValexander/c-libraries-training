@@ -46,6 +46,15 @@ void init(Game *game) {
     load_texture(&game->textures.player[1], "assets/two.png", 48, 48); // игрок
     load_texture(&game->textures.platform, "assets/platform.png", 256, 64); // платформа
 
+    /* Инициализация индикатора */
+    game->progress_bar.rect.x = 50;
+    game->progress_bar.rect.y = 20;
+    game->progress_bar.rect.width = SCREEN_WIDTH - 100;
+    game->progress_bar.rect.height = 30;
+    game->progress_bar.percents = 0;
+    game->progress_bar.dist = LENGTH / 100;
+    game->progress_bar.unit = game->progress_bar.rect.width / 100;
+
     /* Инициализация шрифта */
     game->font = LoadFont("assets/invasion2000.ttf");
 
@@ -61,6 +70,12 @@ void init(Game *game) {
     game->labels[1].size = MeasureTextEx(game->font, game->labels[1].text, 48, 2);
     game->labels[1].pos.x = SCREEN_WIDTH / 2 - game->labels[1].size.x / 2;
     game->labels[1].pos.y = SCREEN_HEIGHT / 2 - game->labels[1].size.y / 2;
+
+    /* Надпись на экране победы */
+    sprintf(game->labels[2].text, "You win!");
+    game->labels[2].size = MeasureTextEx(game->font, game->labels[2].text, 48, 2);
+    game->labels[2].pos.x = SCREEN_WIDTH / 2 - game->labels[2].size.x / 2;
+    game->labels[2].pos.y = SCREEN_HEIGHT / 2 - game->labels[2].size.y / 2;
 
     /* Инициализация игрока */
     game->player.rect.w = 48;
@@ -89,7 +104,7 @@ void init(Game *game) {
     for (int i = 0; i < NUM_STARS; i++) {
         game->stars[i].w = 64;
         game->stars[i].h = 64;
-        game->stars[i].x = SCREEN_WIDTH / 2 + rand() % 38400;
+        game->stars[i].x = SCREEN_WIDTH / 2 + rand() % LENGTH;
         game->stars[i].y = rand() % 480;
     }
 
@@ -162,9 +177,16 @@ void update_game(Game *game) {
             if(game->frame % 10 == 0)
                 player->current_frame = !player->current_frame;
 
+        /* Прогресс игрока */
+        game->progress_bar.percents = player->rect.x / game->progress_bar.dist;
+
         player->dy += GRAVITY; // гравитация
 
     }
+
+    /* Если игрок победил */ 
+    if(game->progress_bar.percents >= 100)
+        game->current_screen = SCREEN_WIN;
 
     /* Если игрок мёртв */
     if(game->player.is_dead && game->death_countdown < 0)
@@ -193,6 +215,9 @@ void update_game(Game *game) {
 
 /* Обновление данных экрана окончания игры */
 void update_game_over(Game *game) {}
+
+/* Обновление данных экрана победы */
+void update_win(Game *game) {}
 
 /* Обновление данных */
 void update(Game *game) {
@@ -223,6 +248,13 @@ void update(Game *game) {
         case SCREEN_GAMEOVER:
 
             update_game_over(game);
+
+        break;
+
+        /* Экран победы */ 
+        case SCREEN_WIN:
+
+            update_win(game);
 
         break;
 
@@ -370,6 +402,27 @@ void render_game(Game *game) {
             WHITE // зачем?
         );
 
+    /* Отрисовка индикатора прогресса */
+    /* Задний план */
+    DrawRectangleRec(
+        game->progress_bar.rect,
+        SKYBLUE
+    );
+    /* Прогресс */
+    DrawRectangle(
+        game->progress_bar.rect.x+3,
+        game->progress_bar.rect.y+3,
+        game->progress_bar.percents * game->progress_bar.unit-6,
+        game->progress_bar.rect.height-6,
+        LIME
+    );
+    /* Обводка */ 
+    DrawRectangleLinesEx(
+        game->progress_bar.rect,
+        3,
+        DARKBLUE
+    );
+
 }
 
 /* Отрисовка экрана окончания игры */
@@ -380,6 +433,21 @@ void render_game_over(Game *game) {
         game->font,
         game->labels[1].text,
         game->labels[1].pos,
+        48,
+        2,
+        WHITE
+    );
+
+}
+
+/* Отрисовка экрана победы */
+void render_win(Game *game) {
+
+    /* Отрисовка текста */
+    DrawTextEx(
+        game->font,
+        game->labels[2].text,
+        game->labels[2].pos,
         48,
         2,
         WHITE
@@ -412,6 +480,13 @@ void render(Game *game) {
         case SCREEN_GAMEOVER:
 
             render_game_over(game);
+
+        break;
+
+        /* Экран победы */ 
+        case SCREEN_WIN:
+
+            render_win(game);
 
         break;
 
