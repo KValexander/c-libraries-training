@@ -21,6 +21,14 @@ typedef enum {
 	SCREEN_WIN,
 } GameScreen;
 
+// Структура Аудио
+typedef struct {
+	Sound jump;
+	Sound win;
+	Sound gameover;
+	Music background;
+} Audio;
+
 // Структура Текстуры
 typedef struct {
 	Texture2D fire; // огонь
@@ -60,6 +68,7 @@ typedef struct {
 	float boost;
 	int dir_star;
 	int dir_boost;
+	int move;
 } MoveStar;
 
 // Структура Задний фон
@@ -80,9 +89,11 @@ typedef struct {
 
 // Структура Игра
 typedef struct {
+	Audio audio; // структура Аудио
 	Textures textures; // структура Текстуры
 	Player player; // структура Игрок
 	Position camera; // структура Камера
+	
 	ProgressBar progress_bar; // структура Индикатор
 	MoveStar move_star; // структура Движение звёзд
 

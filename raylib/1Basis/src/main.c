@@ -47,9 +47,19 @@ void init(Game *game) {
     /* Инициализация окна */
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Raylib");
     SetTargetFPS(FPS); // FPS
+
+    /* Инициализация аудио */ 
+    InitAudioDevice();
     
     /* Инициализация генератора псевдо случайных чисел */
     srand(time(0));
+
+    /* Инициализация аудио */
+    game->audio.jump = LoadSound("assets/jump.ogg");
+    game->audio.win = LoadSound("assets/win.ogg");
+    game->audio.gameover = LoadSound("assets/gameover.ogg");
+    game->audio.background = LoadMusicStream("assets/background.ogg");
+    game->audio.background.looping = true;
 
     /* Инициализация текстур */
     load_texture(&game->textures.fire, "assets/fire.png", 64, 64); // огонь
@@ -110,6 +120,7 @@ void init(Game *game) {
     game->move_star.boost = 0;
     game->move_star.dir_star = 0;
     game->move_star.dir_boost = 0;
+    game->move_star.move = 1;
 
     /* Инициализация камеры */
     game->camera.x = 0;
@@ -146,9 +157,13 @@ void init(Game *game) {
 void events(Game *game) {
 
     /* Рестарт */
-    if(!game->player.is_dead)
+    if(!game->player.is_dead) {
         if(IsKeyDown(KEY_R))
             init_reset(game);
+        if(IsKeyDown(KEY_Q))
+            game->move_star.move = !game->move_star.move;
+    }
+
 
     /* Прыжок */
     if(IsKeyDown(KEY_UP)) {
@@ -198,28 +213,30 @@ void update_game(Game *game) {
     if(!game->player.is_dead) {
 
         /* Ускорение для звёзд */
-        /* Такая ..., переделаю */ 
-        MoveStar *move = &game->move_star;
-        if(move->dir_boost)
-            move->boost += 0.5f;
-        else move->boost -= 0.5f;
+        if(game->move_star.move) {
+            /* Такая ..., переделаю */ 
+            MoveStar *move = &game->move_star;
+            if(move->dir_boost)
+                move->boost += 0.5f;
+            else move->boost -= 0.5f;
 
-        if(move->boost >= 6)
-            move->dir_boost = !move->dir_boost;
-        else if(move->boost <= -6)
-            move->dir_boost = !move->dir_boost;
+            if(move->boost >= 6)
+                move->dir_boost = !move->dir_boost;
+            else if(move->boost <= -6)
+                move->dir_boost = !move->dir_boost;
 
-        /* Движение звёзд */
-        for(int i = 0; i < NUM_STARS; i++) {
-            move->dir_star = !move->dir_star;
-            if(move->dir_star) {
-                game->stars[i].y += move->boost;
-                if(game->stars[i].y < move->start_y[i] - 40)
-                    game->stars[i].y = move->start_y[i] - 40;
-            } else {
-                game->stars[i].x += move->boost;
-                if(game->stars[i].x < move->start_x[i] - 40)
-                    game->stars[i].x = move->start_x[i] - 40;
+            /* Движение звёзд */
+            for(int i = 0; i < NUM_STARS; i++) {
+                move->dir_star = !move->dir_star;
+                if(move->dir_star) {
+                    game->stars[i].y += move->boost;
+                    if(game->stars[i].y < move->start_y[i] - 40)
+                        game->stars[i].y = move->start_y[i] - 40;
+                } else {
+                    game->stars[i].x += move->boost;
+                    if(game->stars[i].x < move->start_x[i] - 40)
+                        game->stars[i].x = move->start_x[i] - 40;
+                }
             }
         }
 
@@ -345,7 +362,10 @@ void collisions(Game *game) {
             game->player.rect.h,
             game->stars[i].w/2,
             game->stars[i].h/2)
-        ) game->player.is_dead = 1;   
+        ) {
+            StopMusicStream(game->audio.background);
+            game->player.is_dead = 1;   
+        }
 
     /* Проверка коллизий на столкновение с платформами */
     for(int i = 0; i < NUM_PLATFORMS; i++) {
@@ -484,6 +504,7 @@ void render_game(Game *game) {
         game->progress_bar.rect,
         WHITE
     );
+
     /* Прогресс */
     DrawRectangle(
         game->progress_bar.rect.x+3,
@@ -492,6 +513,7 @@ void render_game(Game *game) {
         game->progress_bar.rect.height-6,
         SKYBLUE
     );
+
     /* Обводка */ 
     DrawRectangleLinesEx(
         game->progress_bar.rect,
@@ -598,6 +620,12 @@ void loop(Game *game) {
 /* Деинициализация */
 void deinit(Game *game) {
 
+    /* Выгрузка аудио */
+    UnloadSound(game->audio.jump);
+    UnloadSound(game->audio.win);
+    UnloadSound(game->audio.gameover);
+    UnloadMusicStream(game->audio.background);
+
     /* Выгрузка текстур */
     UnloadTexture(game->textures.fire);
     UnloadTexture(game->textures.star);
@@ -627,7 +655,6 @@ int main(void) {
 
     /* Деинициализация */
     deinit(&game);
-
 
     return 0;
 }
