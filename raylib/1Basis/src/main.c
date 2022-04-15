@@ -18,15 +18,27 @@ void load_texture(Texture2D *texture, char src[], int w, int h) {
 
 /* Новая жизнь */
 void init_reset(Game *game) {
+    /* Обновление экрана */
     sprintf(game->labels[0].text, "x %d", game->player.lives);
     game->current_screen = SCREEN_LIVES;
 
+    /* Обновление игрока */
     game->player.rect.x = 100;
     game->player.rect.y = 100;
     game->player.dx = 0;
     game->player.dy = 0;
     game->player.is_dead = 0;
     game->player.on_platform = 0;
+
+    /* Обновление движения звёзд */ 
+    game->move_star.boost = 0;
+    game->move_star.dir_star = 0;
+    game->move_star.dir_boost = 0;
+
+    for (int i = 0; i < NUM_STARS; i++) {
+        game->stars[i].x = game->move_star.start_x[i];
+        game->stars[i].y = game->move_star.start_y[i];
+    }
 } 
 
 /* Инициализация */
@@ -45,6 +57,11 @@ void init(Game *game) {
     load_texture(&game->textures.player[0], "assets/one.png", 48, 48); // игрок
     load_texture(&game->textures.player[1], "assets/two.png", 48, 48); // игрок
     load_texture(&game->textures.platform, "assets/platform.png", 256, 64); // платформа
+
+    /* Инициализация заднего фона */
+    game->background.image = LoadTexture("assets/background.png");
+    // load_texture(&game->background.image, "assets/background.png", SCREEN_WIDTH, SCREEN_HEIGHT);
+    game->background.scroll = 0.0f;
 
     /* Инициализация индикатора */
     game->progress_bar.rect.x = 50;
@@ -89,6 +106,11 @@ void init(Game *game) {
     game->player.on_platform = 0;
     game->player.current_frame = 0;
 
+    /* Инициализация движения звёзд */
+    game->move_star.boost = 0;
+    game->move_star.dir_star = 0;
+    game->move_star.dir_boost = 0;
+
     /* Инициализация камеры */
     game->camera.x = 0;
     game->camera.y = 0;
@@ -106,6 +128,8 @@ void init(Game *game) {
         game->stars[i].h = 64;
         game->stars[i].x = SCREEN_WIDTH / 2 + rand() % LENGTH;
         game->stars[i].y = rand() % 480;
+        game->move_star.start_x[i] = game->stars[i].x;
+        game->move_star.start_y[i] = game->stars[i].y;
     }
 
     /* Инициализация платформ */
@@ -122,8 +146,9 @@ void init(Game *game) {
 void events(Game *game) {
 
     /* Рестарт */
-    if(IsKeyDown(KEY_R))
-        init_reset(game);
+    if(!game->player.is_dead)
+        if(IsKeyDown(KEY_R))
+            init_reset(game);
 
     /* Прыжок */
     if(IsKeyDown(KEY_UP)) {
@@ -164,8 +189,39 @@ void update_lives(Game *game) {}
 /* Обновление данных экрана игры */
 void update_game(Game *game) {
 
+    /* Задний фон */
+    game->background.scroll -= 0.3f;
+    if(game->background.scroll <= -game->background.image.width*2)
+        game->background.scroll;
+
     /* Если игрок жив */
     if(!game->player.is_dead) {
+
+        /* Ускорение для звёзд */
+        /* Такая ..., переделаю */ 
+        MoveStar *move = &game->move_star;
+        if(move->dir_boost)
+            move->boost += 0.5f;
+        else move->boost -= 0.5f;
+
+        if(move->boost >= 6)
+            move->dir_boost = !move->dir_boost;
+        else if(move->boost <= -6)
+            move->dir_boost = !move->dir_boost;
+
+        /* Движение звёзд */
+        for(int i = 0; i < NUM_STARS; i++) {
+            move->dir_star = !move->dir_star;
+            if(move->dir_star) {
+                game->stars[i].y += move->boost;
+                if(game->stars[i].y < move->start_y[i] - 40)
+                    game->stars[i].y = move->start_y[i] - 40;
+            } else {
+                game->stars[i].x += move->boost;
+                if(game->stars[i].x < move->start_x[i] - 40)
+                    game->stars[i].x = move->start_x[i] - 40;
+            }
+        }
 
         /* Передвижение игрока */
         Player *player = &game->player;
@@ -179,6 +235,10 @@ void update_game(Game *game) {
 
         /* Прогресс игрока */
         game->progress_bar.percents = player->rect.x / game->progress_bar.dist;
+
+        /* Если игрок упал */
+        if(player->rect.y > 1000)
+            player->is_dead = 1;
 
         player->dy += GRAVITY; // гравитация
 
@@ -367,6 +427,22 @@ void render_lives(Game *game) {
 void render_game(Game *game) {
     ClearBackground(SKYBLUE); // задний фон
 
+    /* Отрисовка заднего фона */
+    DrawTextureEx(
+        game->background.image,
+        (Vector2){game->background.scroll, 0},
+        0.0f,
+        2.0f,
+        WHITE
+    );
+    DrawTextureEx(
+        game->background.image,
+        (Vector2){game->background.image.width*2 + game->background.scroll, 0},
+        0.0f,
+        2.0f,
+        WHITE
+    );
+
     /* Отрисовка игрока */
     DrawTexture(
         game->textures.player[game->player.current_frame],
@@ -406,7 +482,7 @@ void render_game(Game *game) {
     /* Задний план */
     DrawRectangleRec(
         game->progress_bar.rect,
-        SKYBLUE
+        WHITE
     );
     /* Прогресс */
     DrawRectangle(
@@ -414,7 +490,7 @@ void render_game(Game *game) {
         game->progress_bar.rect.y+3,
         game->progress_bar.percents * game->progress_bar.unit-6,
         game->progress_bar.rect.height-6,
-        LIME
+        SKYBLUE
     );
     /* Обводка */ 
     DrawRectangleLinesEx(
@@ -528,6 +604,7 @@ void deinit(Game *game) {
     UnloadTexture(game->textures.player[0]);
     UnloadTexture(game->textures.player[1]);
     UnloadTexture(game->textures.platform);
+    UnloadTexture(game->background.image);
 
     /* Выгрузка шрифтов */
     UnloadFont(game->font);

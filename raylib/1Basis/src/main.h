@@ -54,6 +54,20 @@ typedef struct {
 	float percents;
 } ProgressBar;
 
+// Структура Движение звёзд
+typedef struct {
+	int start_x[NUM_STARS], start_y[NUM_STARS];
+	float boost;
+	int dir_star;
+	int dir_boost;
+} MoveStar;
+
+// Структура Задний фон
+typedef struct {
+	Texture2D image;
+	float scroll;
+} Background;
+
 // Структура Игрок
 typedef struct {
 	Rect rect; // данные
@@ -70,6 +84,9 @@ typedef struct {
 	Player player; // структура Игрок
 	Position camera; // структура Камера
 	ProgressBar progress_bar; // структура Индикатор
+	MoveStar move_star; // структура Движение звёзд
+
+	Background background;// структура Задний фон
 
 	Font font; // шрифт
 
