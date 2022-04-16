@@ -24,6 +24,7 @@ typedef enum {
 // Структура Аудио
 typedef struct {
 	Sound jump;
+	Sound death;
 	Sound win;
 	Sound gameover;
 	Music background;

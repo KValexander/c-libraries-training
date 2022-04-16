@@ -34,6 +34,7 @@ void init_reset(Game *game) {
     game->move_star.boost = 0;
     game->move_star.dir_star = 0;
     game->move_star.dir_boost = 0;
+    game->move_star.move = 1;
 
     for (int i = 0; i < NUM_STARS; i++) {
         game->stars[i].x = game->move_star.start_x[i];
@@ -56,6 +57,7 @@ void init(Game *game) {
 
     /* Инициализация аудио */
     game->audio.jump = LoadSound("assets/jump.ogg");
+    game->audio.death = LoadSound("assets/death.ogg");
     game->audio.win = LoadSound("assets/win.ogg");
     game->audio.gameover = LoadSound("assets/gameover.ogg");
     game->audio.background = LoadMusicStream("assets/background.ogg");
@@ -169,6 +171,7 @@ void events(Game *game) {
     if(IsKeyDown(KEY_UP)) {
         game->player.current_frame = 1;
         if(game->player.on_platform) {
+            PlaySound(game->audio.jump);
             game->player.dy = -8;
             game->player.on_platform = 0;
         } game->player.dy -= 0.2f;
@@ -262,12 +265,18 @@ void update_game(Game *game) {
     }
 
     /* Если игрок победил */ 
-    if(game->progress_bar.percents >= 100)
+    if(game->progress_bar.percents >= 100) {
+        StopMusicStream(game->audio.background);
+        PlaySound(game->audio.win);
+        game->frame = 0;
         game->current_screen = SCREEN_WIN;
+    }
 
     /* Если игрок мёртв */
-    if(game->player.is_dead && game->death_countdown < 0)
+    if(game->player.is_dead && game->death_countdown < 0) {
+        PlaySound(game->audio.death);
         game->death_countdown = 120;
+    }
 
     /* Обратный отсчёт смерти */ 
     if(game->death_countdown >= 0) {
@@ -283,7 +292,11 @@ void update_game(Game *game) {
                 init_reset(game);
 
             /* Окончательная смерть */
-            else game->current_screen = SCREEN_GAMEOVER;
+            else {
+                StopMusicStream(game->audio.background);
+                PlaySound(game->audio.gameover);
+                game->current_screen = SCREEN_GAMEOVER;
+            }
 
         }
     }
@@ -299,10 +312,14 @@ void update_win(Game *game) {}
 /* Обновление данных */
 void update(Game *game) {
     game->frame++; // счётчик времени
+    UpdateMusicStream(game->audio.background);
 
     /* Время экрана загрузки */ 
-    if(game->frame > 120 && game->current_screen != SCREEN_GAMEOVER)
+    if(game->frame > 120 && game->current_screen == SCREEN_LIVES) {
+        // StopMusicStream(game->audio.background);
+        PlayMusicStream(game->audio.background);
         game->current_screen = SCREEN_GAME;
+    }
 
     /* Распределение экранов */ 
     switch(game->current_screen) {
@@ -363,7 +380,6 @@ void collisions(Game *game) {
             game->stars[i].w/2,
             game->stars[i].h/2)
         ) {
-            StopMusicStream(game->audio.background);
             game->player.is_dead = 1;   
         }
 
@@ -622,6 +638,7 @@ void deinit(Game *game) {
 
     /* Выгрузка аудио */
     UnloadSound(game->audio.jump);
+    UnloadSound(game->audio.death);
     UnloadSound(game->audio.win);
     UnloadSound(game->audio.gameover);
     UnloadMusicStream(game->audio.background);
