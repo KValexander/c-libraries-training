@@ -32,7 +32,8 @@ target_link_libraries(main
 )
 
 # Перенос ресурсов
-# ADD_CUSTOM_TARGET(link_assets ALL COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/assets)
+ADD_CUSTOM_TARGET(link_assets ALL COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/assets)
+ADD_CUSTOM_TARGET(link_levels ALL COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/levels ${CMAKE_BINARY_DIR}/levels)
 
 # Без этого не работает и я не знаю почему
 if(MINGW)

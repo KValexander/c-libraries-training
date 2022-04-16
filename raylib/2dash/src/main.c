@@ -1,3 +1,4 @@
+/* Include files */
 #include "game.h"
 
 int main(void) {

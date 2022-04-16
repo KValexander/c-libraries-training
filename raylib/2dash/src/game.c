@@ -1,27 +1,45 @@
+/* Include libraries */
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
+/* Include libraries */
 #include <raylib.h>
 
+/* Include files */
+#include "screens.h"
 #include "game.h"
 
 /* Initialization */ 
 void game_init(Game *game) {
 
 	/* Window initialization */
-	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Dash");
+	InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Dash");
 	SetTargetFPS(FPS); // FPS
+
+	/* Randomizer initialization */ 
+	srand(time(0));
+
+	/* Screens initialization */
+	game->screen = SCREEN_MAIN_MENU;
+	screens_init(game);
 
 }
 
 /* Handling events */ 
 void game_events(Game *game) {
 
+	/* Screens events */
+	screens_events(game);
+
 }
 
 /* Data update */ 
 void game_update(Game *game) {
+	game->frame++; // time
+
+	/* Screens update */
+	screens_update(game);
 	
 }
 
@@ -33,6 +51,9 @@ void game_collisions(Game *game) {
 /* Rendering */
 void game_render(Game *game) {
 	ClearBackground(SKYBLUE);
+
+	/* Screens render */
+	screens_render(game);
 	
 }
 
