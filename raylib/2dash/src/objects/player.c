@@ -25,24 +25,22 @@ void player_events(Player *player) {
 
 	if(IsKeyDown(KEY_LEFT)) // left
 		player->x -= 10;
-	if(IsKeyDown(KEY_RIGHT)) // right
+	else if(IsKeyDown(KEY_RIGHT)) // right
 		player->x += 10;
 	if(IsKeyDown(KEY_UP)) // up
 		player->y -= 10;
-	if(IsKeyDown(KEY_DOWN)) // down
+	else if(IsKeyDown(KEY_DOWN)) // down
 		player->y += 10;
 
 }
 
-/* Player render */ 
-void player_render(Player *player) {
-
+/* Player draw */ 
+void player_draw(Player *player, int scroll_x) {
 	DrawRectangle(
-		player->x,
+		scroll_x + player->x,
 		player->y,
 		player->w,
 		player->h,
-		WHITE
+		BLACK
 	);
-
 }

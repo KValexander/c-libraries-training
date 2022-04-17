@@ -20,7 +20,6 @@ typedef struct {
 extern void player_init(Player *player);
 extern void player_events(Player *player);
 extern void player_update(Player *player);
-extern void player_render(Player *player);
-extern void player_deinit(Player *player);
+extern void player_draw(Player *player, int scroll_x);
 
 #endif

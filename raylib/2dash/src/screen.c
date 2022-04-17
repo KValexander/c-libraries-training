@@ -3,7 +3,7 @@
 
 /* Screen initialization */ 
 void screen_init(Screen *screen) {
-	screen->current = SCREEN_MAIN_MENU;
+	screen->current = SCREEN_SELECT_LEVEL;
 }
 
 /* Change screen */
@@ -15,7 +15,6 @@ void screen_change(Screen *screen, int n) {
 /* Check screen */
 int screen_check(int n) {
 	switch(n) {
-		case SCREEN_MAIN_MENU:
 		case SCREEN_SELECT_LEVEL:
 		case SCREEN_LEVEL:
 		case SCREEN_LEVEL_WIN:
