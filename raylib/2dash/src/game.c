@@ -7,10 +7,9 @@
 #include <raylib.h>
 
 /* Include files */
-#include "screens.h"
 #include "game.h"
 
-/* Initialization */ 
+/* Initialization */
 void game_init(Game *game) {
 
 	/* Window initialization */
@@ -20,63 +19,41 @@ void game_init(Game *game) {
 	/* Randomizer initialization */ 
 	srand(time(0));
 
-	/* Screens initialization */
-	game->screen = SCREEN_MAIN_MENU;
-	screens_init(game);
+	/* Screen initialization */
+	screen_init(&game->screen);
 
-}
-
-/* Handling events */ 
-void game_events(Game *game) {
-
-	/* Screens events */
-	screens_events(game);
+	/* Level initialization */
+	level_init(&game->levels);
 
 }
 
 /* Data update */ 
 void game_update(Game *game) {
 	game->frame++; // time
-
-	/* Screens update */
-	screens_update(game);
-	
-}
-
-/* Check collisions */ 
-void game_collisions(Game *game) {
 	
 }
 
 /* Rendering */
 void game_render(Game *game) {
-	ClearBackground(SKYBLUE);
-
-	/* Screens render */
-	screens_render(game);
+	ClearBackground(SKYBLUE); // backgrund
 	
 }
 
 /* Game loop */ 
 void game_loop(Game *game) {
 
+	/* Game loop */ 
 	while(!WindowShouldClose()) {
-
-		/* Handling events */ 
-		game_events(game);
 
 		/* Data update */ 
 		game_update(game);
 
-		/* Check collisions */ 
-		game_collisions(game);
-
 		/* Rendering */ 
-		BeginDrawing();
+		BeginDrawing(); // start drawing
 
-			game_render(game);
+			game_render(game); // drawing
 		
-		EndDrawing();
+		EndDrawing(); // end drawing
 
 	}
 }

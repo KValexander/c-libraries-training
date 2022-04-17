@@ -15,20 +15,23 @@ typedef struct {
 
 // Struct Level
 typedef struct {
-	Player player;
-	Rect rects[MAX_RECTS];
+	int difficulty; // level difficulty
+	Player player; // struct Player
+	Rect rects[MAX_RECTS]; // array of Rects
 } Level;
 
 // Struct Levels
 typedef struct {
-	Level levels[MAX_LEVELS];
+	int current; // current level
+	
+	Level levels[MAX_LEVELS]; // levels
 } Levels;
 
 // Prototypes
-extern void level_init();
-extern void level_load();
-extern void level_update();
-extern void level_render();
-extern void level_deinit();
+extern void level_init(Levels *levels);
+extern void level_loading(Levels *levels);
+extern void level_select(Levels *levels, int current);
+extern void level_update(Levels *levels);
+extern void level_render(Levels *levels);
 
 #endif
