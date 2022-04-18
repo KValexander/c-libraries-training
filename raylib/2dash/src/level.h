@@ -4,7 +4,8 @@
 // Constants
 #define MAX_LEVELS 10
 #define MAX_RECTS 1000
-#define GRAVITY 0.4f
+#define LEVEL_GRAVITY 0.4f
+#define LEVEL_ACCELERATION 0.5f
 
 // Include files
 #include "objects/player.h"
@@ -21,13 +22,17 @@ typedef struct {
 
 // Struct Level
 typedef struct {
-	char name[30]; // level name
+	int frame; // time
 	int difficulty; // level difficulty
 	int count_rects; // count rects
-	int state; // level state
+	char name[30]; // level name
+
+	int is_victory; // victory
 
 	Position camera; // struct Position, camera
+	Position start_player; // struct Position, start player pos
 	Player player; // struct Player
+	Rect victory_condition; // struct Rect, victory condition
 	Rect rects[MAX_RECTS]; // array of Rects
 } Level;
 
@@ -41,10 +46,12 @@ typedef struct {
 
 // Prototypes
 extern void level_init(Levels *levels);
+extern void level_one_init(Level *level);
 extern void level_loading(Levels *levels);
 extern void level_change(Levels *levels, int n);
 
 extern void level_update(Levels *levels);
+extern void level_collisions(Levels *levels);
 extern void level_render(Levels *levels);
 
 #endif

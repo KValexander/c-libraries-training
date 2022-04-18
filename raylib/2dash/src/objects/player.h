@@ -18,8 +18,8 @@ typedef struct {
 
 // Prototypes
 extern void player_init(Player *player);
-extern void player_events(Player *player);
-extern void player_update(Player *player);
-extern void player_draw(Player *player, int scroll_x);
+extern void player_keydown(Player *player);
+extern void player_update(Player *player, float gravity, float acceleration);
+extern void player_draw(Player *player, int scroll_x, int scroll_y);
 
 #endif

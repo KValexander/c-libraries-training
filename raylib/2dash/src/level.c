@@ -34,33 +34,121 @@ void level_init(Levels *levels) {
 
 /* Change level */
 void level_change(Levels *levels, int n) {
+
+	/* Change level */ 
 	if(n >= 0 || n <= levels->count_levels)
 		levels->current_level = n;
 
 	/* Level */ 
 	Level *level = &levels->levels[levels->current_level];
+	level->frame = 0; // time
+	level->is_victory = 0; // state
 
 	/* Player initialization */
 	player_init(&level->player);
+	level->player.x = level->start_player.x;
+	level->player.y = level->start_player.y;
 
-	/* Camera initialization */
-	level->camera.x = 0;
-	level->camera.y = 0;
 }
 
 /* Update level */
 void level_update(Levels *levels) {
 	if(levels->current_level < 0) return; // check
 
+	/* Restart */
+	if(IsKeyDown(KEY_R))
+		level_change(levels, levels->current_level);
+
 	/* Level */ 
 	Level *level = &levels->levels[levels->current_level];
+	level->frame++; // time
 
-	/* Player events */
-	player_events(&level->player);
+	/* Level processing */ 
+	if(!level->is_victory) {
 
-    /* Camera update */
-    level->camera.x = -level->player.x + (960 / 2 - level->player.w / 2);
-    if(level->camera.x > 0) level->camera.x = 0;
+		/* Update player */
+		player_update(&level->player, LEVEL_GRAVITY, LEVEL_ACCELERATION);
+
+	    /* Camera update */
+	    level->camera.x = -level->player.x + (960 / 2 - level->player.w / 2);
+	    level->camera.y = -level->player.y + (540 / 2 - level->player.h / 2);
+	    if(level->camera.x > 0) level->camera.x = 0;
+	    if(level->camera.y < 0) level->camera.y = 0;
+
+	    /* Level collisions */
+	    level_collisions(levels);
+
+	}
+
+}
+
+/* Check collision */
+int collide_2d(float x1, float y1, float x2, float y2, float wt1, float ht1, float wt2, float ht2) {
+    return (!((x1 > (x2+wt2)) || (x2 > (x1+wt1)) || (y1 > (y2+ht2)) || (y2 > (y1+ht1))));
+}
+
+/* Level collisions */
+void level_collisions(Levels *levels) {
+	Level *level = &levels->levels[levels->current_level];
+
+	/* Check victory */
+	if(collide_2d(
+		level->player.x,
+		level->player.y,
+		level->victory_condition.x,
+		level->victory_condition.y,
+		level->player.w,
+		level->player.h,
+		level->victory_condition.w,
+		level->victory_condition.h
+	)) level->is_victory = 1;
+
+	/* Check rect collision */
+	for(int i = 0; i <= level->count_rects; i++) {
+
+		/* Player data */
+		float px = level->player.x, py = level->player.y;
+		float pw = level->player.w, ph = level->player.h;
+		
+		/* Rect data */
+		float rx = level->rects[i].x, ry = level->rects[i].y;
+		float rw = level->rects[i].w, rh = level->rects[i].h;
+
+		/* Up */
+		if(px + pw > rx && px < rx + rw) {
+			if(py + ph > ry && py < ry) {
+				level->player.y = ry - ph;
+				py = level->player.y;
+
+				level->player.dy = 0;
+				level->player.is_jump = 1;
+				level->player.on_surface = 1;
+			}
+		}
+
+		/* Sides */
+		if(py + ph > ry && py < ry + rh) {
+			
+			/* Left */
+			if(px + pw > rx && px < rx) {
+				level->player.x = rx - pw;
+				px = level->player.x;
+
+				level->player.dx = 0;
+			}
+			
+			/* Right */
+			else if(px < rx + rw && px > rx + rw) {
+				level->player.x = rx + rw;
+				px = level->player.x;
+
+				level->player.dx = 0;
+			}
+
+		}
+
+	}
+
 }
 
 /* Render level */
@@ -72,17 +160,40 @@ void level_render(Levels *levels) {
 	Level *level = &levels->levels[levels->current_level]; // level
 
 	/* Draw player */
-	player_draw(&level->player, level->camera.x);
+	player_draw(&level->player, level->camera.x, level->camera.y);
+
+	/* Draw victory zone */
+	DrawRectangle(
+		level->camera.x + level->victory_condition.x,
+		level->camera.y + level->victory_condition.y,
+		level->victory_condition.w,
+		level->victory_condition.h,
+		DARKGREEN
+	);
 
 	/* Draw rects */
 	for(int i = 0; i <= level->count_rects; i++)
 		DrawRectangle(
 			level->camera.x + level->rects[i].x,
-			level->rects[i].y,
+			level->camera.y + level->rects[i].y,
 			level->rects[i].w,
 			level->rects[i].h,
 			DARKGRAY
 		);
+
+	/* Level victory */
+	if(level->is_victory) {
+		/* Draw text */
+		DrawText("You victory!", 30, 20, 48, DARKGREEN);
+		DrawText("R for restart!", 30, 80, 36, DARKGREEN);
+	}
+
+	/* Player is dead */
+	else if(level->player.state == PLAYER_STATE_DYING) {
+		/* Draw text */
+		DrawText("You lose!", 30, 20, 48, MAROON);
+		DrawText("R for restart!", 30, 80, 36, MAROON);
+	}
 
 }
 
@@ -90,8 +201,26 @@ void level_render(Levels *levels) {
 
 
 
+/* One level initialization */
+void level_one_init(Level *level) {
+	level->difficulty = -1; // difficulty
+	level->count_rects = -1; // count rects
+	level->is_victory = 0; // state
 
+	/* Player start position */ 
+	level->start_player.x = 0;
+	level->start_player.y = 0;
 
+	/* Camera */
+	level->camera.x = 0;
+	level->camera.y = 0;
+
+	/* Victory condition */
+	level->victory_condition.x = 0;
+	level->victory_condition.y = 0;
+	level->victory_condition.w = 0;
+	level->victory_condition.h = 0;
+}
 
 /* Loading levels */
 void level_loading(Levels *levels) {
@@ -135,11 +264,9 @@ void level_loading(Levels *levels) {
 	/* Get level data */
 	for(int i = 0; i <= levels->count_levels; i++) {
 		/* Level initialization */
-		Level *level = &levels->levels[i];
-		strcpy(level->name, filenames[i]);
-		level->difficulty = -1;
-		level->count_rects = -1;
-		level->state = 0;
+		Level *level = &levels->levels[i]; // level
+		strcpy(level->name, filenames[i]); // level name
+		level_one_init(level);
 
 		/* Concatenation */ 
 		strcpy(line, filenames[i]);
@@ -156,21 +283,22 @@ void level_loading(Levels *levels) {
 			istr = strtok(line, " ");
 			while(istr != NULL) {
 
-				/* Rect properties */ 
-				if(!strcmp(current, "rect")) {
-					properties[n] = atoi(istr);
-					n++;
+				/* Writing properties */ 
+				if(strcmp(current, "")) {
+					properties[n] = atoi(istr); n++;
 				}
 
-				/* Difficulty properties */ 
-				else if(!strcmp(current, "difficulty")) {
-					properties[n] = atoi(istr);
-					n++;
-				}
+				/* Player */ 
+				if(!strcmp(istr, "player"))
+					strcpy(current, "player");
 
 				/* Difficulty */
-				if(!strcmp(istr, "difficulty"))
+				else if(!strcmp(istr, "difficulty"))
 					strcpy(current, "difficulty");
+
+				/* Victory */
+				else if(!strcmp(istr, "victory"))
+					strcpy(current, "victory");
 
 				/* Rect */ 
 				else if(!strcmp(istr, "rect")) {
@@ -183,13 +311,27 @@ void level_loading(Levels *levels) {
 			}
 
 			/* Writing data */
+			/* Player start position */
+			if(!strcmp(current, "player")) {
+				level->start_player.x = properties[0];
+				level->start_player.y = properties[1];
+			}
+
+			/* Victory */
+			else if(!strcmp(current, "victory")) {
+				level->victory_condition.x = properties[0];
+				level->victory_condition.y = properties[1];
+				level->victory_condition.w = properties[2];
+				level->victory_condition.h = properties[3];
+			}
+
 			/* Difficulty */
-			if(!strcmp(current, "difficulty"))
+			else if(!strcmp(current, "difficulty"))
 				level->difficulty = properties[0];
 
 			/* Rects */
 			else if(!strcmp(current, "rect")) {
-				if(level->count_rects < MAX_LEVELS) {
+				if(level->count_rects < MAX_RECTS) {
 					level->rects[level->count_rects].x = properties[0];
 					level->rects[level->count_rects].y = properties[1];
 					level->rects[level->count_rects].w = properties[2];
@@ -202,8 +344,8 @@ void level_loading(Levels *levels) {
 		fclose(file); // close file
 
 		/* Restrictions */
-		if(level->count_rects >= MAX_LEVELS)
-			level->count_rects = MAX_LEVELS - 1;
+		if(level->count_rects >= MAX_RECTS)
+			level->count_rects = MAX_RECTS - 1;
 	}
 
 	/* Close folder */ 

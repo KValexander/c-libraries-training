@@ -8,7 +8,6 @@
 
 // Include files
 #include "screen.h"
-#include "assets.h"
 #include "level.h"
 
 // Structs
@@ -16,7 +15,6 @@ typedef struct {
 	int frame; // frames
 
 	Screen screen; // struct Screen
-	Assets assets; // struct Assets
 	Levels levels; // struct Levels
 	
 } Game;
