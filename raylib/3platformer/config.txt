@@ -1,0 +1,4 @@
+WIDTH=960
+HEIGHT=560
+FPS=60
+TITLE=Platformer
