@@ -30,6 +30,13 @@ void player_keydown(Player *player) {
 			player->is_jump = 0;
 		} player->dy -= 0.2f;
 	}
+	/* Jump on mouse */ 
+	else if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+		if(player->is_jump) {
+			player->dy = -4;
+			player->is_jump = 0;
+		} player->dy -= 0.2f;
+	}
 
 	// if(IsKeyDown(KEY_LEFT)) // left
 	// 	player->x -= 10;

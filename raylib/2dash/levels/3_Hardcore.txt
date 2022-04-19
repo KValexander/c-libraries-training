@@ -1,3 +1,0 @@
-difficulty 3
-rect 0 400 400 50
-rect 400 400 400 50

@@ -54,4 +54,6 @@ extern void level_update(Levels *levels);
 extern void level_collisions(Levels *levels);
 extern void level_render(Levels *levels);
 
+extern int collide_2d(float x1, float y1, float x2, float y2, float wt1, float ht1, float wt2, float ht2);
+
 #endif

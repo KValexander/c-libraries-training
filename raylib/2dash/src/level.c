@@ -154,7 +154,6 @@ void level_collisions(Levels *levels) {
 /* Render level */
 void level_render(Levels *levels) {
 	if(levels->current_level < 0) return; // check
-	ClearBackground(LIGHTGRAY); // background
 	
 	/* Level */
 	Level *level = &levels->levels[levels->current_level]; // level
@@ -186,6 +185,7 @@ void level_render(Levels *levels) {
 		/* Draw text */
 		DrawText("You victory!", 30, 20, 48, DARKGREEN);
 		DrawText("R for restart!", 30, 80, 36, DARKGREEN);
+		DrawText("M to select level!", 30, 140, 24, DARKGREEN);
 	}
 
 	/* Player is dead */
@@ -193,6 +193,7 @@ void level_render(Levels *levels) {
 		/* Draw text */
 		DrawText("You lose!", 30, 20, 48, MAROON);
 		DrawText("R for restart!", 30, 80, 36, MAROON);
+		DrawText("M to select level!", 30, 140, 24, MAROON);
 	}
 
 }
