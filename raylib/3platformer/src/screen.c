@@ -24,19 +24,58 @@ void screen_init(Screen *screen) {
 	srand(time(0));
 
 	/* Current screen */
-	screen->current_screen = SCREEN_SELECT_LEVEL;
+	screen->current_screen = SCREEN_LEVEL;
 
-	change_config_prop("WIDTH", "560");
+	/* Level initialization */
+	level_init(&screen->level);
 
 }
 
 /* Update data */
 void screen_update(Screen *screen) {
+	screen->frame; // time
+
+	/* Active screen */ 
+	switch(screen->current_screen) {
+
+		/* Screen select level */ 
+		case SCREEN_SELECT_LEVEL: break;
+		
+		/* Screen level */ 
+		case SCREEN_LEVEL:
+		
+			/* Level update */ 
+			level_update(&screen->level);
+
+		break;
+
+		default: break;
+
+	}
 
 }
 
 /* Render data */
 void screen_render(Screen *screen) {
+	ClearBackground(LIGHTGRAY); // backgrund
+
+	/* Active screen */ 
+	switch(screen->current_screen) {
+
+		/* Screen select level */ 
+		case SCREEN_SELECT_LEVEL: break;
+		
+		/* Screen level */ 
+		case SCREEN_LEVEL:
+
+			/* Level render */ 
+			level_render(&screen->level);
+
+		break;
+
+		default: break;
+		
+	}
 
 }
 
@@ -46,10 +85,13 @@ void screen_loop(Screen *screen) {
 	/* Game loop */
 	while(!WindowShouldClose()) {
 
-		/* Drawing */ 
+		/* Screen update */
+		screen_update(screen); 
+
+		/* Rendering */ 
 		BeginDrawing(); // start drawing
 
-			ClearBackground(LIGHTGRAY); // backgrund
+			screen_render(screen); // screen render
 
 		EndDrawing(); // end drawing
 
@@ -59,6 +101,9 @@ void screen_loop(Screen *screen) {
 
 /* Screen deinitialization */
 void screen_deinit(Screen *screen) {
+
+	/* Level deinitialization */
+	level_deinit(screen); 
 
 	/* Close window */
 	CloseWindow();

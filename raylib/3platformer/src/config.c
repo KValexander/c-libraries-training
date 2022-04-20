@@ -76,7 +76,7 @@ void change_config_prop(char *prop, char *value) {
 	update_config_prop(index, value);
 
 	/* Open file */
-	FILE *file = fopen("config.txt", "w");
+	FILE *file = fopen("config.txt", "w+");
 
 	/* Writing data */
 	fprintf(file, "%s=%d\n", "WIDTH", config_screen_width);
@@ -85,7 +85,7 @@ void change_config_prop(char *prop, char *value) {
 	fprintf(file, "%s=%d\n", "FPS", config_screen_fps);
 
 	/* Close file */
-	fclose(file); 
+	fclose(file);
 
 } 
 

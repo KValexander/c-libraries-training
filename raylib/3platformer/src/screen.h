@@ -1,6 +1,9 @@
 #ifndef SCREEN_H_
 #define SCREEN_H_
 
+/* Include files */
+#include "level.h"
+
 /* Enum Screens*/
 typedef enum {
 	SCREEN_SELECT_LEVEL = 0,
@@ -11,6 +14,7 @@ typedef enum {
 typedef struct {
 	int frame; // time
 
+	Level level; // struct Level
 	Screens current_screen; // current screen
 } Screen;
 

@@ -1,0 +1,3 @@
+player 50 50
+enemy 
+platform 0 500 300 40
