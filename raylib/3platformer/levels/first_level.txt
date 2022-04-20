@@ -1,3 +1,5 @@
 player 50 50
-enemy 
-platform 0 500 300 40
+enemy 150 150
+victory 400 200
+surface 0 500 300 40
+platform 0 300 100 40

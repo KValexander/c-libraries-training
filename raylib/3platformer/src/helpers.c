@@ -1,4 +1,9 @@
 /* Include libraries */
+#include <stdio.h>
+#include <dirent.h>
+#include <string.h>
+
+/* Include libraries */
 #include <raylib.h> 
 
 /* Include files */

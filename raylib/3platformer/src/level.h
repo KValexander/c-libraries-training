@@ -32,7 +32,8 @@ typedef struct {
 /* Struct Background */
 typedef struct {
 	Texture2D image;
-	float scroll;
+	float scroll, scroll_speed;
+	float w, h;
 } Background;
 
 /* Struct Object */
@@ -61,6 +62,12 @@ typedef struct {
 	int frame; // time
 	int count_levels; // count levels
 	int current_level; // current level
+
+	int is_loading; // check loading level
+
+	/* List of level entities */ 
+	char entities[5][30];
+	int count_entities; // count entities
 	
 	Textures textures; // struct Textures
 	Background background[NUM_BACKGROUNDS]; // struct Background, array
@@ -72,6 +79,8 @@ extern void level_init(Level *level); // level initialization
 extern void onelevel_init(OneLevel *level); // one level initialization
 extern void level_deinit(); // level deinitialization
 
+extern int get_filenames_from_dir(char filenames[MAX_LEVELS][30],
+								  int n, char *path); // get filenames from directory
 extern void loading_levels(Level *level); // loading levels
 
 extern int level_check(Level *level, int n); // check level existence
@@ -79,5 +88,11 @@ extern void level_change(Level *level, int n); // change current level
 
 extern void level_update(Level *level); // level update
 extern void level_render(Level *level); // level render
+
+/* Background prototypes */
+extern void background_init(Background *background);
+extern void background_deinit(Background *background);
+extern void background_update(Background *background);
+extern void background_draw(Background *background);
 
 #endif
