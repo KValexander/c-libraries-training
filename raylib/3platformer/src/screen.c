@@ -26,6 +26,8 @@ void screen_init(Screen *screen) {
 	/* Current screen */
 	screen->current_screen = SCREEN_SELECT_LEVEL;
 
+	change_config_prop("WIDTH", "560");
+
 }
 
 /* Update data */
