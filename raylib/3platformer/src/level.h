@@ -79,15 +79,19 @@ extern void level_init(Level *level); // level initialization
 extern void onelevel_init(OneLevel *level); // one level initialization
 extern void level_deinit(); // level deinitialization
 
-extern int get_filenames_from_dir(char filenames[MAX_LEVELS][30],
-								  int n, char *path); // get filenames from directory
-extern void loading_levels(Level *level); // loading levels
-
 extern int level_check(Level *level, int n); // check level existence
 extern void level_change(Level *level, int n); // change current level
 
 extern void level_update(Level *level); // level update
 extern void level_render(Level *level); // level render
+
+/* Loading levels prototypes */ 
+extern int get_filenames_from_dir(char filenames[MAX_LEVELS][30],
+								  int n, char *path); // get filenames from directory
+int get_entity_index(Level *level, char *entity); // get entity index
+void writing_onelevel_entity_data(OneLevel *level,
+					int index, char values[4][30]); // writing onelevel entuty data
+extern void loading_levels(Level *level); // loading levels
 
 /* Background prototypes */
 extern void background_init(Background *background);
