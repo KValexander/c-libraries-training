@@ -147,6 +147,10 @@ void onelevel_init(OneLevel *level) {
 /* Level update */ 
 void level_update(Level *level) {
 	if(!level->is_loading || level->current_level == -1) return;
+
+	/* Restart */
+	if(IsKeyPressed(KEY_R))
+		level_change(level, level->current_level);
 	
 	/* Current level */
 	OneLevel *lv = &level->levels[level->current_level];
@@ -159,6 +163,19 @@ void level_update(Level *level) {
 
 		/* Player update */
 		player_update(&lv->player);
+		lv->player.dy += GRAVITY; // gravity
+		if(lv->player.y > get_screen_height() + 300)
+			lv->state = LEVEL_GAMEOVER;
+
+		/* Enemies update */
+		for(int i = 0; i < lv->count_enemies; i++) {
+			enemy_update(&lv->enemies[i]);
+			if(!lv->enemies[i].is_dead) {
+				lv->enemies[i].dy += GRAVITY; // gravity
+				if(lv->enemies[i].y > get_screen_height() + 300)
+					lv->enemies[i].is_dead = 1;
+			}
+		}
 
 		/* Camera update */
 	    lv->camera.x = -lv->player.x + (get_screen_width() / 2 - lv->player.w / 2);
@@ -175,25 +192,66 @@ void level_update(Level *level) {
 
 /* OneLevel collision */
 void onelevel_collisions(OneLevel *level) {
+	int side;
+
+	float px = level->player.x, py = level->player.y;
+	float pw = level->player.w, ph = level->player.h;
 
 	/* Check victory */
-	if(collide_2d(
-		level->player.x,
-		level->player.y,
-		level->victory.x,
-		level->victory.y,
-		level->player.w,
-		level->player.h,
-		level->victory.w,
-		level->victory.h
-	)) level->state = LEVEL_VICTORY;
+	if(collide_2d( px, py, level->victory.x, level->victory.y, pw, ph, level->victory.w, level->victory.h )) level->state = LEVEL_VICTORY;
 
 	/* Enemies collision */
 	for(int i = 0; i < level->count_enemies; i++)
-		enemy_collision(&level->enemies[i], level->player.x, level->player.y, level->player.w, level->player.h);
+		if(collide_2d(
+			level->enemies[i].x,
+			level->enemies[i].y,
+			px, py,
+			level->enemies[i].w,
+			level->enemies[i].h,
+			pw, ph
+		)) level->state = LEVEL_GAMEOVER;
 
 	/* Surfaces collision */
-	
+	for(int i = 0; i < level->count_surfaces; i++) {
+		float sx = level->surfaces[i].x, sy = level->surfaces[i].y;
+		float sw = level->surfaces[i].w, sh = level->surfaces[i].h;
+
+		/* With player */
+		player_on_surface(&level->player, surface_collision(&level->surfaces[i], px, py, pw, ph), sx, sy, sw, sh);
+
+		/* With enemies */
+		for(int i = 0; i < level->count_enemies; i++)
+			if(collide_2d(
+				level->enemies[i].x,
+				level->enemies[i].y,
+				sx, sy,
+				level->enemies[i].w,
+				level->enemies[i].h,
+				sw, sh
+			)) level->enemies[i].dy = 0;
+	}
+
+	/* Platforms collision */
+	for(int i = 0; i < level->count_platforms; i++) {
+		float fx = level->platforms[i].x, fy = level->platforms[i].y;
+		float fw = level->platforms[i].w, fh = level->platforms[i].h;
+
+		/* With player */
+		player_on_surface(&level->player, platform_collision(&level->platforms[i], px, py, pw, ph), fx, fy, fw, fh);
+
+		/* With enemies */
+		for(int i = 0; i < level->count_enemies; i++)
+			if(collide_2d(
+				level->enemies[i].x,
+				level->enemies[i].y,
+				fx, fy,
+				level->enemies[i].w,
+				level->enemies[i].h,
+				fw, fh
+			)) level->enemies[i].dy = 0;
+			
+	}
+
 }
 
 /* Level render */ 
@@ -223,6 +281,19 @@ void level_render(Level *level) {
 	/* Platforms render */
 	for(int i = 0; i < lv->count_platforms; i++)
 		platform_draw(&lv->platforms[i], &level->textures.platform, lv->camera);
+
+	/* VICTORY */ 
+	if(lv->state == LEVEL_VICTORY) {
+		DrawText("VICTORY", 20, 30, 36, DARKGREEN); 
+		DrawText("R for restart", 20, 80, 24, DARKGREEN); 
+		DrawText("N for next level", 20, 110, 24, DARKGREEN); 
+	}
+
+	/* GAMEOVER*/
+	else if(lv->state == LEVEL_GAMEOVER) {
+		DrawText("GAMEOVER", 20, 30, 36, MAROON); 
+		DrawText("R for restart", 20, 70, 24, MAROON); 
+	}
 
 }
 

@@ -1,5 +1,6 @@
 /* Include libraries */
 #include <stdio.h>
+#include <math.h>
 
 /* Include libraries */
 #include <raylib.h>
@@ -16,21 +17,65 @@ void player_init(Player *player) {
 	player->h = 84;
 	player->dx = 0.0f;
 	player->dy = 0.0f;
+	player->is_jump = 0;
 
+}
+
+/* Player on surface */
+void player_on_surface(Player *player, int side, float x, float y, float w, float h) {
+	switch(side) {
+		case 1: // up
+			player->dy = 0;
+			player->y = y - player->h;
+			player->is_jump = 1;
+		break;
+		case 3: // down
+			if(!player->dy)
+				player->dy = 0;
+			player->y = y + h;
+		break;
+	}
+}
+
+/* Player jump */ 
+void player_jump(Player *player) {
+	if(player->is_jump) {
+		player->dy = -10;
+		player->is_jump = 0;
+	} player->dy -= 0.2f;
 }
 
 /* Player update */ 
 void player_update(Player *player) {
 
-	/* KeyDown */
-	if(IsKeyDown(KEY_RIGHT)) // right
-		player->x += 10;
-	else if (IsKeyDown(KEY_LEFT)) // left
-		player->x -= 10;
-	if (IsKeyDown(KEY_UP)) // up
-		player->y -= 10;
-	else if (IsKeyDown(KEY_DOWN)) // down
-		player->y += 10;
+	/* JUMP */
+	if(IsKeyDown(KEY_UP))
+		player_jump(player);
+
+	/* Move RIGHT */ 
+	if(IsKeyDown(KEY_RIGHT)) {
+		player->dx += 0.5;
+		if(player->dx > 6)
+			player->dx = 6;
+	}
+
+	/* Move LEFT */ 
+	else if(IsKeyDown(KEY_LEFT)) {
+		player->dx -= 0.5;
+		if(player->dx < -6)
+			player->dx = -6;
+	}
+
+	/* STOP move */
+	else {
+		player->dx *= 0.8f;
+		if(fabsf(player->dx) < 0.1f)
+			player->dx = 0;
+	}
+
+	/* Player move */
+	player->x += player->dx;
+	player->y += player->dy;
 
 }
 

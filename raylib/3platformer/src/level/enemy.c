@@ -1,5 +1,6 @@
 /* Include libraries */
 #include <stdio.h>
+#include <math.h>
 
 /* Include libraries */
 #include <raylib.h>
@@ -17,27 +18,17 @@ void enemy_init(Enemy *enemy) {
 	enemy->h = 84;
 	enemy->dx = 0.0f;
 	enemy->dy = 0.0f;
+	enemy->is_jump = 0;
 	enemy->is_dead = 0;
 
 }
 
-/* Enemy collision */
-int enemy_collision(Enemy *enemy, int x, int y, int w, int h){
-	
-	/* If the enemy is dead */ 
-	if(enemy->is_dead) return 0;
-
-	/* Getting the side of the collision */
-	int side = sides_collision(x, y, enemy->x, enemy->y, w, h, enemy->w, enemy->h);
-
-	switch(side) {
-
-		/* UP */ 
-		case 1: enemy->is_dead = 1; break;
-
-	}
-
-	return side;
+/* Enemy jump */ 
+void enemy_jump(Enemy *enemy) {
+	if(enemy->is_jump) {
+		enemy->dy = -10;
+		enemy->is_jump = 0;
+	} enemy->dy -= 0.2f;
 }
 
 /* Enemy update */ 
@@ -46,6 +37,9 @@ void enemy_update(Enemy *enemy) {
 	/* If the enemy is dead */ 
 	if(enemy->is_dead) return;
 
+	/* Enemy move */
+	enemy->x += enemy->dx;
+	enemy->y += enemy->dy;
 
 }
 

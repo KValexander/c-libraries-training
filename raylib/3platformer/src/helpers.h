@@ -4,6 +4,11 @@
 /* Include libraries */
 #include <raylib.h> 
 
+/* Struct Rect */
+typedef struct {
+	float x, y, w, h;
+} Rect;
+
 /* Load texture */ 
 extern void load_texture(Texture2D *texture,
 					char *src, int w,
