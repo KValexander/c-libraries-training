@@ -33,8 +33,8 @@ void level_init(Level *level) {
 	load_texture(&level->textures.player, "assets/player.png", 46, 84);
 	load_texture(&level->textures.enemy, "assets/enemy.png", 46, 84);
 	load_texture(&level->textures.victory, "assets/victory.png", 64, 84);
-	load_texture(&level->textures.surface, "assets/surface.png", 384, 64);
-	load_texture(&level->textures.platform, "assets/platform.png", 300, 64);
+	load_texture(&level->textures.surface, "assets/surface.png", 400, 48);
+	load_texture(&level->textures.platform, "assets/platform.png", 300, 48);
 
 	/* Background initialization */
 	background_init(level->background);
@@ -42,31 +42,193 @@ void level_init(Level *level) {
 	/* Loading levels */
 	loading_levels(level);
 
+	/* Change levels */
+	level_change(level, 0);
+
 }
 
-/* OneLevel initialization */ 
-void onelevel_init(OneLevel *level) {
+/* Level deinitialization */
+void level_deinit(Level *level) {
+
+	/* Textures deinitialization */ 
+	UnloadTexture(level->textures.player);
+	UnloadTexture(level->textures.enemy);
+	UnloadTexture(level->textures.victory);
+	UnloadTexture(level->textures.surface);
+	UnloadTexture(level->textures.platform);
+
+	/* Background deinitialization */
+	background_deinit(level->background);
+}
+
+/* Check level existence */
+int level_check(Level *level, int n) {
+	return (n >= 0 && n < level->count_levels);
+}
+
+/* Change current level */ 
+void level_change(Level *level, int n) {
+
+	/* Check level existence */
+	if(!level_check(level, n)) return;
+	
+	/* Change current level */ 
+	level->current_level = n;
 
 	/* Level initialization */
+	onelevel_init(&level->levels[level->current_level]);
+
+}
+
+/* OneLevel preinitialization */
+void onelevel_preinit(OneLevel *level) {
 	level->name = "Level"; // level name
 	level->count_enemies = 0; // count enemies
 	level->count_surfaces = 0; // count surfaces
 	level->count_platforms = 0; // count platforms
+} 
+
+/* OneLevel initialization */ 
+void onelevel_init(OneLevel *level) {
+	/* Level state */
+	level->state = LEVEL_STOP;
 
 	/* Camera initialization */
 	level->camera.x = 0;
 	level->camera.y = 0;
 
 	/* Player initialization */
-	level->player.w = 46;
-	level->player.h = 84;
+	player_init(&level->player);
+
+	/* Player start position */ 
+	level->player.x = level->start_player.x;
+	level->player.y = level->start_player.y;
 
 	/* Victory initialization */
-	level->victory.w = 64;
-	level->victory.h = 86;
+	victory_init(&level->victory);
+
+	/* Victory start position */ 
+	level->victory.x = level->start_victory.x;
+	level->victory.y = level->start_victory.y;
+
+	/* Enemies initialization */
+	for(int i = 0; i < level->count_enemies; i++) {
+		enemy_init(&level->enemies[i]);
+		
+		/* Enemy start position */ 
+		level->enemies[i].x = level->start_enemies[i].x;
+		level->enemies[i].y = level->start_enemies[i].y;
+	} 
+
+
+	/* Surfaces initialization */
+	for(int i = 0; i < level->count_surfaces; i++) {
+		surface_init(&level->surfaces[i]);
+	
+		/* Surface start position */ 
+		level->surfaces[i].x = level->start_surfaces[i].x;
+		level->surfaces[i].y = level->start_surfaces[i].y;
+	}
+
+	/* Platforms initialization */
+	for(int i = 0; i < level->count_platforms; i++) {
+		platform_init(&level->platforms[i]);
+		
+		/* Platforms start position */ 
+		level->platforms[i].x = level->start_platforms[i].x;
+		level->platforms[i].y = level->start_platforms[i].y;
+	}
+
+	/* Level state */
+	level->state = LEVEL_PLAY;
 
 }
 
+/* Level update */ 
+void level_update(Level *level) {
+	if(!level->is_loading || level->current_level == -1) return;
+	
+	/* Current level */
+	OneLevel *lv = &level->levels[level->current_level];
+
+	/* Level state LEVEL PLAY */
+	if(lv->state == LEVEL_PLAY) {
+
+		/* Background update */
+		background_update(level->background);
+
+		/* Player update */
+		player_update(&lv->player);
+
+		/* Camera update */
+	    lv->camera.x = -lv->player.x + (get_screen_width() / 2 - lv->player.w / 2);
+	    lv->camera.y = -lv->player.y + (get_screen_height() / 2 - lv->player.h / 2);
+	    if(lv->camera.x > 0) lv->camera.x = 0;
+		if(lv->camera.y < 0) lv->camera.y = 0;
+
+		/* Collisions */
+		onelevel_collisions(lv);
+
+	} 
+
+}
+
+/* OneLevel collision */
+void onelevel_collisions(OneLevel *level) {
+
+	/* Check victory */
+	if(collide_2d(
+		level->player.x,
+		level->player.y,
+		level->victory.x,
+		level->victory.y,
+		level->player.w,
+		level->player.h,
+		level->victory.w,
+		level->victory.h
+	)) level->state = LEVEL_VICTORY;
+
+	/* Enemies collision */
+	for(int i = 0; i < level->count_enemies; i++)
+		enemy_collision(&level->enemies[i], level->player.x, level->player.y, level->player.w, level->player.h);
+
+	/* Surfaces collision */
+	
+}
+
+/* Level render */ 
+void level_render(Level *level) {
+	if(!level->is_loading || level->current_level == -1) return;
+	
+	/* Current level */
+	OneLevel *lv = &level->levels[level->current_level];
+
+	/* Background draw */
+	background_draw(level->background);
+
+	/* Player render */
+	player_draw(&lv->player, &level->textures.player, lv->camera);
+
+	/* Victory render */ 
+	victory_draw(&lv->victory, &level->textures.victory, lv->camera);
+
+	/* Enemies render */
+	for(int i = 0; i < lv->count_enemies; i++)
+		enemy_draw(&lv->enemies[i], &level->textures.enemy, lv->camera);
+
+	/* Surfaces render */
+	for(int i = 0; i < lv->count_surfaces; i++)
+		surface_draw(&lv->surfaces[i], &level->textures.surface, lv->camera);
+
+	/* Platforms render */
+	for(int i = 0; i < lv->count_platforms; i++)
+		platform_draw(&lv->platforms[i], &level->textures.platform, lv->camera);
+
+}
+
+
+/* LOADING LEVELS */ 
+/* ================================ */
 
 /* Get filenames from directory */ 
 int get_filenames_from_dir(char filenames[MAX_LEVELS][30], int n, char *path) {
@@ -100,47 +262,37 @@ int get_entity_index(Level *level, char *entity) {
 
 /* Writing OneLevel entity data */
 void writing_onelevel_entity_data(OneLevel *level, int index, char values[4][30]) {
-
-	/* FIX */ 
-	if(!strcmp(values[0], "0"))
-		strcpy(values[0], "1");
 	
 	/* Writing data */
 	switch(index) {
 
 		/* The number corresponds to the number of the entity */
 		case 0: // player
-			if(!atoi(values[0]) || !atoi(values[1])) break;
-			level->player.x = atoi(values[0]);
-			level->player.y = atoi(values[1]);
+			// if(!atoi(values[0]) || !atoi(values[1])) break;
+			level->start_player.x = atoi(values[0]);
+			level->start_player.y = atoi(values[1]);
 		break;
 		case 1: // enemy
-			if(!atoi(values[0]) || !atoi(values[1])) break;
-			level->enemies[level->count_enemies].x = atoi(values[0]);
-			level->enemies[level->count_enemies].y = atoi(values[1]);
-			level->enemies[level->count_enemies].w = 46;
-			level->enemies[level->count_enemies].h = 84;
+			// if(!atoi(values[0]) || !atoi(values[1])) break;
+			level->start_enemies[level->count_enemies].x = atoi(values[0]);
+			level->start_enemies[level->count_enemies].y = atoi(values[1]);
 			level->count_enemies++;
 		break;
 		case 2: // victory
-			if(!atoi(values[0]) || !atoi(values[1])) break;
-			level->player.x = atoi(values[0]);
-			level->player.y = atoi(values[1]);
+			// if(!atoi(values[0]) || !atoi(values[1])) break;
+			level->start_victory.x = atoi(values[0]);
+			level->start_victory.y = atoi(values[1]);
 		break;
 		case 3: // surface
-			if(!atoi(values[0]) || !atoi(values[1])|| !atoi(values[2]) || !atoi(values[3])) break;
-			level->surfaces[level->count_surfaces].x = atoi(values[0]);
-			level->surfaces[level->count_surfaces].y = atoi(values[1]);
-			level->surfaces[level->count_surfaces].w = atoi(values[2]);
-			level->surfaces[level->count_surfaces].h = atoi(values[3]);
+			// if(!atoi(values[0]) || !atoi(values[1])) break;
+			level->start_surfaces[level->count_surfaces].x = atoi(values[0]);
+			level->start_surfaces[level->count_surfaces].y = atoi(values[1]);
 			level->count_surfaces++;
 		break;
 		case 4: // platform
-			if(!atoi(values[0]) || !atoi(values[1])|| !atoi(values[2]) || !atoi(values[3])) break;
-			level->platforms[level->count_platforms].x = atoi(values[0]);
-			level->platforms[level->count_platforms].y = atoi(values[1]);
-			level->platforms[level->count_platforms].w = atoi(values[2]);
-			level->platforms[level->count_platforms].h = atoi(values[3]);
+			// if(!atoi(values[0]) || !atoi(values[1])) break;
+			level->start_platforms[level->count_platforms].x = atoi(values[0]);
+			level->start_platforms[level->count_platforms].y = atoi(values[1]);
 			level->count_platforms++;
 		break;
 
@@ -168,9 +320,9 @@ void loading_levels(Level *level) {
 	/* Getting level data from files */
 	for(int i = 0; i < level->count_levels; i++) {
 
-		/* OneLevel initialization */
+		/* OneLevel preinitialization */
 		OneLevel *lv = &level->levels[i];
-		onelevel_init(lv);
+		onelevel_preinit(lv);
 
 		/* Concatination */
 		strcpy(buffer, filenames[i]);
@@ -220,112 +372,4 @@ void loading_levels(Level *level) {
 	/* Loading levels success */ 
 	level->is_loading = 1;
 
-} 
-
-/* Level deinitialization */
-void level_deinit(Level *level) {
-
-	/* Textures deinitialization */ 
-	UnloadTexture(level->textures.player);
-	UnloadTexture(level->textures.enemy);
-	UnloadTexture(level->textures.victory);
-	UnloadTexture(level->textures.surface);
-	UnloadTexture(level->textures.platform);
-
-	/* Background deinitialization */
-	background_deinit(level->background);
 }
-
-/* Level update */ 
-void level_update(Level *level) {
-
-	/* Background update */
-	background_update(level->background);
-
-}
-
-/* Level render */ 
-void level_render(Level *level) {
-
-	/* Background draw */
-	background_draw(level->background);
-
-}
-
-
-
-/* BACKGROUND */
-/* ================================ */
-
-/* Background initialization */ 
-void background_init(Background *background) {
-
-	/* Main background */ 
-	background[0].w = get_screen_width(); // width
-	background[0].h = get_screen_height(); // height
-	background[0].scroll = 0.0f; // scroll
-	background[0].scroll_speed = 0.1f; // scroll speed
-	load_texture(
-		&background[0].image,
-		"assets/background.png",
-		background[0].w,
-		background[0].h
-	); // load texture
-
-	// Cloud background
-	background[1].w = 1920; // width
-	background[1].h = 1018; // height
-	background[1].scroll = 0.0f; // scroll
-	background[1].scroll_speed = 0.5f; // scroll speed
-	load_texture(
-		&background[1].image,
-		"assets/cloud.png",
-		background[1].w,
-		background[1].h
-	); // load texture
-
-}
-
-/* Background deinitialization */
-void background_deinit(Background *background) {
-	for(int i = 0; i < NUM_BACKGROUNDS; i++)
-		UnloadTexture(background[i].image);
-}
-
-/* Background update */
-void background_update(Background *background) {
-
-	/* Scroll update */
-	background[0].scroll -= background[0].scroll_speed;
-	background[1].scroll -= background[1].scroll_speed;
-
-	/* Check scroll */
-	if(background[0].scroll <= -background[0].w) background[0].scroll = 0;
-	if(background[1].scroll <= -background[1].w) background[1].scroll = 0;
-
-}
-
-/* Background draw */
-void background_draw(Background *background) {
-
-	/* Background draw */
-	for(int i = 0; i < NUM_BACKGROUNDS; i++) {
-		DrawTextureEx(
-			background[i].image, // texture
-			(Vector2){ background[i].scroll, 0}, // pos
-			0.0f, // rotate
-			1.0f, // scale
-			WHITE // color
-		);
-		DrawTextureEx(
-			background[i].image, // texture
-			(Vector2){ background[i].w + background[i].scroll, 0}, // pos
-			0.0f, // rotate
-			1.0f, // scale
-			WHITE // color
-		);
-	}
-
-} 
-
-/* ================================ */ 

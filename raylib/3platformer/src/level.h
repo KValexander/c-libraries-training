@@ -3,7 +3,6 @@
 
 /* Constants */
 #define GRAVITY 0.4f
-#define NUM_BACKGROUNDS 2
 #define MAX_LEVELS 10
 #define MAX_ENEMIES 100
 #define MAX_SURFACES 100
@@ -12,12 +11,20 @@
 /* Include libraries */
 #include <raylib.h> 
 
+/* Include files */
+#include "level/background.h"
+#include "level/player.h"
+#include "level/enemy.h"
+#include "level/victory.h"
+#include "level/surface.h"
+#include "level/platform.h"
+
 /* Enum State*/
 typedef enum {
 	LEVEL_STOP = 0,
 	LEVEL_PLAY,
 	LEVEL_GAMEOVER,
-	LEVEL_WIN
+	LEVEL_VICTORY
 } State;
 
 /* Struct Textures */
@@ -28,13 +35,6 @@ typedef struct {
 	Texture2D surface;
 	Texture2D platform;
 } Textures; 
-
-/* Struct Background */
-typedef struct {
-	Texture2D image;
-	float scroll, scroll_speed;
-	float w, h;
-} Background;
 
 /* Struct Object */
 typedef struct {
@@ -49,12 +49,22 @@ typedef struct {
 	int count_platforms; // count platforms
 
 	State state; // level state
-	Object camera; // struct Object, camera
-	Object player; // struct Object, player
-	Object victory; // struct Object, victory zone
-	Object enemies[MAX_ENEMIES]; // struct Object, array of enemies
-	Object surfaces[MAX_SURFACES]; // struct Object, array of surfaces
-	Object platforms[MAX_PLATFORMS]; // struct Object, array of platforms
+
+	/* Starting positions of objects */ 
+	Object start_camera; // camera
+	Object start_player; // player
+	Object start_victory; // victory
+	Object start_enemies[MAX_ENEMIES]; // enemies
+	Object start_surfaces[MAX_ENEMIES]; // surfaces
+	Object start_platforms[MAX_ENEMIES]; // platforms
+
+	/* Objects */ 
+	Vector2 camera; // struct Vector2, camera
+	Player player; // struct Player
+	Victory victory; // struct Victory
+	Enemy enemies[MAX_ENEMIES]; // struct Enemy, array
+	Surface surfaces[MAX_SURFACES]; // struct Surface, array
+	Platform platforms[MAX_PLATFORMS]; // struct Platform, array
 } OneLevel;
 
 /* Struct Level */
@@ -76,27 +86,23 @@ typedef struct {
 
 /* Prototypes */
 extern void level_init(Level *level); // level initialization
-extern void onelevel_init(OneLevel *level); // one level initialization
 extern void level_deinit(); // level deinitialization
+extern void onelevel_preinit(OneLevel *level); // one level preinitialization
+extern void onelevel_init(OneLevel *level); // one level initialization
 
 extern int level_check(Level *level, int n); // check level existence
 extern void level_change(Level *level, int n); // change current level
 
+extern void onelevel_collisions(OneLevel *level); // onelevel collisions
 extern void level_update(Level *level); // level update
 extern void level_render(Level *level); // level render
 
 /* Loading levels prototypes */ 
 extern int get_filenames_from_dir(char filenames[MAX_LEVELS][30],
 								  int n, char *path); // get filenames from directory
-int get_entity_index(Level *level, char *entity); // get entity index
-void writing_onelevel_entity_data(OneLevel *level,
+extern int get_entity_index(Level *level, char *entity); // get entity index
+extern void writing_onelevel_entity_data(OneLevel *level,
 					int index, char values[4][30]); // writing onelevel entuty data
 extern void loading_levels(Level *level); // loading levels
-
-/* Background prototypes */
-extern void background_init(Background *background);
-extern void background_deinit(Background *background);
-extern void background_update(Background *background);
-extern void background_draw(Background *background);
 
 #endif
