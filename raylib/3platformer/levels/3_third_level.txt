@@ -1,0 +1,3 @@
+player 0 400
+victory 2300 200
+surface 0 500

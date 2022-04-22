@@ -43,12 +43,14 @@ typedef struct {
 
 /* Struct OneLevel */
 typedef struct {
+	int frame; // time
 	char *name; // level name
 	int count_enemies; // count enemies
 	int count_surfaces; // count enemies
 	int count_platforms; // count platforms
 
 	State state; // level state
+	int access; // access
 
 	/* Starting positions of objects */ 
 	Object start_camera; // camera
@@ -69,7 +71,6 @@ typedef struct {
 
 /* Struct Level */
 typedef struct {
-	int frame; // time
 	int count_levels; // count levels
 	int current_level; // current level
 

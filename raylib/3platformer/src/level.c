@@ -16,7 +16,6 @@
 void level_init(Level *level) {
 
 	/* Level initialization */ 
-	level->frame = 0; // time
 	level->count_levels = 0; // count levels
 	level->current_level = -1; // current level
 	level->is_loading = 0; // check loading level
@@ -30,8 +29,8 @@ void level_init(Level *level) {
 	level->count_entities = sizeof(level->entities) / sizeof(level->entities[0]); // count entities
 
 	/* Textures initialization */
-	load_texture(&level->textures.player, "assets/player.png", 46, 84);
-	load_texture(&level->textures.enemy, "assets/enemy.png", 46, 84);
+	load_texture(&level->textures.player, "assets/player.png", 256, 348);
+	load_texture(&level->textures.enemy, "assets/enemy.png", 264, 360);
 	load_texture(&level->textures.victory, "assets/victory.png", 64, 84);
 	load_texture(&level->textures.surface, "assets/surface.png", 400, 48);
 	load_texture(&level->textures.platform, "assets/platform.png", 300, 48);
@@ -82,6 +81,7 @@ void level_change(Level *level, int n) {
 
 /* OneLevel preinitialization */
 void onelevel_preinit(OneLevel *level) {
+	level->access = 0; // passed
 	level->name = "Level"; // level name
 	level->count_enemies = 0; // count enemies
 	level->count_surfaces = 0; // count surfaces
@@ -90,6 +90,12 @@ void onelevel_preinit(OneLevel *level) {
 
 /* OneLevel initialization */ 
 void onelevel_init(OneLevel *level) {
+	/* Level frame */
+	level->frame = 0;
+
+	/* Level access */ 
+	level->access = 1;
+
 	/* Level state */
 	level->state = LEVEL_STOP;
 
@@ -147,13 +153,19 @@ void onelevel_init(OneLevel *level) {
 /* Level update */ 
 void level_update(Level *level) {
 	if(!level->is_loading || level->current_level == -1) return;
+	
+	/* Current level */
+	OneLevel *lv = &level->levels[level->current_level];
+	lv->frame++; // time
 
 	/* Restart */
 	if(IsKeyPressed(KEY_R))
 		level_change(level, level->current_level);
-	
-	/* Current level */
-	OneLevel *lv = &level->levels[level->current_level];
+
+	/* Next level */
+	if(lv->state == LEVEL_VICTORY)
+		if(IsKeyPressed(KEY_N))
+			level_change(level, level->current_level + 1);
 
 	/* Level state LEVEL PLAY */
 	if(lv->state == LEVEL_PLAY) {
@@ -162,14 +174,14 @@ void level_update(Level *level) {
 		background_update(level->background);
 
 		/* Player update */
-		player_update(&lv->player);
+		player_update(&lv->player, lv->frame);
 		lv->player.dy += GRAVITY; // gravity
 		if(lv->player.y > get_screen_height() + 300)
 			lv->state = LEVEL_GAMEOVER;
 
 		/* Enemies update */
 		for(int i = 0; i < lv->count_enemies; i++) {
-			enemy_update(&lv->enemies[i]);
+			enemy_update(&lv->enemies[i], lv->frame);
 			if(!lv->enemies[i].is_dead) {
 				lv->enemies[i].dy += GRAVITY; // gravity
 				if(lv->enemies[i].y > get_screen_height() + 300)
@@ -203,12 +215,12 @@ void onelevel_collisions(OneLevel *level) {
 	/* Enemies collision */
 	for(int i = 0; i < level->count_enemies; i++)
 		if(collide_2d(
-			level->enemies[i].x,
-			level->enemies[i].y,
-			px, py,
-			level->enemies[i].w,
-			level->enemies[i].h,
-			pw, ph
+			level->enemies[i].x + level->enemies[i].w / 4,
+			level->enemies[i].y + level->enemies[i].h / 4,
+			px + pw / 4, py + ph / 4,
+			level->enemies[i].w / 2,
+			level->enemies[i].h / 2,
+			pw / 2, ph / 2
 		)) level->state = LEVEL_GAMEOVER;
 
 	/* Surfaces collision */
@@ -228,7 +240,10 @@ void onelevel_collisions(OneLevel *level) {
 				level->enemies[i].w,
 				level->enemies[i].h,
 				sw, sh
-			)) level->enemies[i].dy = 0;
+			)) {
+				level->enemies[i].dy = 0;
+				level->enemies[i].is_jump = 1;
+			}
 	}
 
 	/* Platforms collision */
@@ -248,7 +263,10 @@ void onelevel_collisions(OneLevel *level) {
 				level->enemies[i].w,
 				level->enemies[i].h,
 				fw, fh
-			)) level->enemies[i].dy = 0;
+			)) {
+				level->enemies[i].dy = 0;
+				level->enemies[i].is_jump = 1;
+			}
 			
 	}
 
@@ -284,15 +302,19 @@ void level_render(Level *level) {
 
 	/* VICTORY */ 
 	if(lv->state == LEVEL_VICTORY) {
+		level->levels[level->current_level + 1].access = 1;
 		DrawText("VICTORY", 20, 30, 36, DARKGREEN); 
-		DrawText("R for restart", 20, 80, 24, DARKGREEN); 
-		DrawText("N for next level", 20, 110, 24, DARKGREEN); 
+		DrawText("R for restart", 20, 80, 24, DARKGREEN);
+		DrawText("M to select level", 20, 110, 24, DARKGREEN); 
+		if(level_check(level, level->current_level+1))
+			DrawText("N for next level", 20, 140, 24, DARKGREEN); 
 	}
 
 	/* GAMEOVER*/
 	else if(lv->state == LEVEL_GAMEOVER) {
 		DrawText("GAMEOVER", 20, 30, 36, MAROON); 
-		DrawText("R for restart", 20, 70, 24, MAROON); 
+		DrawText("R for restart", 20, 80, 24, MAROON); 
+		DrawText("M to select level", 20, 110, 24, MAROON); 
 	}
 
 }

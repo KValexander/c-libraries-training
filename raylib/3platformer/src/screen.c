@@ -8,6 +8,7 @@
 
 /* Include files */
 #include "config.h"
+#include "helpers.h"
 #include "screen.h"
 
 /* Screen initialization */
@@ -24,7 +25,7 @@ void screen_init(Screen *screen) {
 	srand(time(0));
 
 	/* Current screen */
-	screen->current_screen = SCREEN_LEVEL;
+	screen->current_screen = SCREEN_SELECT_LEVEL;
 
 	/* Level initialization */
 	level_init(&screen->level);
@@ -35,11 +36,38 @@ void screen_init(Screen *screen) {
 void screen_update(Screen *screen) {
 	screen->frame; // time
 
+	/* Select level */ 
+	if(IsKeyPressed(KEY_M))
+		screen->current_screen = SCREEN_SELECT_LEVEL;
+
 	/* Active screen */ 
 	switch(screen->current_screen) {
 
 		/* Screen select level */ 
-		case SCREEN_SELECT_LEVEL: break;
+		case SCREEN_SELECT_LEVEL:
+			Vector2 mouse = GetMousePosition();
+
+			/* Select levels */ 
+			for(int i = 0; i < screen->level.count_levels; i++) {
+				if(collide_2d(
+					20, 70*i + 20,
+					mouse.x, mouse.y,
+					300, 50,
+					1, 1
+				)) {
+					DrawRectangleLines(20, 70*i + 20, 300, 50, BLACK);
+					if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+						if(screen->level.levels[i].access || !i) {
+							screen->current_screen = SCREEN_LEVEL;
+							level_change(&screen->level, i);
+						}
+					}
+
+				};
+
+			}
+
+		break;
 		
 		/* Screen level */ 
 		case SCREEN_LEVEL:
@@ -63,7 +91,16 @@ void screen_render(Screen *screen) {
 	switch(screen->current_screen) {
 
 		/* Screen select level */ 
-		case SCREEN_SELECT_LEVEL: break;
+		case SCREEN_SELECT_LEVEL:
+
+			/* Out levels */
+			for(int i = 0; i < screen->level.count_levels; i++) {
+				char name[10]; sprintf(name, "Level %d", i + 1);
+				if(!i) DrawText(name, 30, 70*i + 30, 30, BLACK);
+				else DrawText(name, 30, 70*i + 30, 30, (screen->level.levels[i].access) ? BLACK : GRAY);
+			}
+
+		break;
 		
 		/* Screen level */ 
 		case SCREEN_LEVEL:
