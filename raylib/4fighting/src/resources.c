@@ -14,6 +14,7 @@ void load_resources(Resources *resources) {
 
 	/* Load textures */
 	r_load_texture(resources, "logo", "assets/logo.png"); // logo
+	r_load_texture(resources, "intro", "assets/intro.png"); // intro
 
 }
 
@@ -22,6 +23,7 @@ void unload_resources(Resources *resources) {
 
 	/* Unload textures */
 	r_unload_texture(resources, "logo"); // logo
+	r_unload_texture(resources, "intro"); // logo
 
 }
 
