@@ -8,6 +8,7 @@
 
 /* Include files */
 #include "resources.h"
+#include "storage.h"
 
 /* Enum GameScreen */
 typedef enum GameScreen{
@@ -25,6 +26,7 @@ typedef struct Game {
 	GameScreen c_screen; // current screen
 
 	Resources resources; // struct Resources
+	Storage storage; // struct storage
 } Game;
 
 /* Prototypes */

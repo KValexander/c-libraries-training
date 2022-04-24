@@ -1,8 +1,8 @@
 #ifndef LOGO_H_
 #define LOGO_H_
 
-/* Struct intro */ 
-typedef struct Intro {
+/* Struct LogoIntro */ 
+typedef struct LogoIntro {
 	int w, h; // single frame size
 
 	/* Animation */ 
@@ -10,7 +10,7 @@ typedef struct Intro {
 	int current_frame; // current frame on line
 	int max_lines; // max lines
 	int max_on_line; // max frame on line
-} Intro;
+} LogoIntro;
 
 /* Prototypes */
 /* Entry points */ 

@@ -7,8 +7,13 @@
 /* Include files */
 #include "common.h"
 #include "game.h"
-#include "screens/logo.h"
 
+/* Screens */ 
+#include "screens/logo.h"
+#include "screens/select_character.h"
+#include "screens/select_location.h"
+#include "screens/battle.h"
+#include "screens/battle_result.h"
 
 
 /* Game initialization */
@@ -58,22 +63,22 @@ void game_change_screen(Game *game, int screen) {
 		break;
 
 		/* Screen SELECT CHARACTER */ 
-		case SCREEN_SELECT_CHARACTER:
+		case SCREEN_SELECT_CHARACTER: select_character_entry(game);
 			game->c_screen = screen;
 		break;
 
 		/* Screen SELECT LOCATION */ 
-		case SCREEN_SELECT_LOCATION:
+		case SCREEN_SELECT_LOCATION: select_location_entry(game);
 			game->c_screen = screen;
 		break;
 
 		/* Screen BATTLE */ 
-		case SCREEN_BATTLE:
-			game->c_screen = screen;
+		case SCREEN_BATTLE: battle_entry(game);
+			game->c_screen = screen; 
 		break;
 
 		/* Screen BATTLE RESULT */ 
-		case SCREEN_BATTLE_RESULT:
+		case SCREEN_BATTLE_RESULT: battle_result_entry(game);
 			game->c_screen = screen;
 		break;
 
@@ -96,19 +101,19 @@ void game_update(Game *game) {
 		break;
 
 		/* Screen SELECT CHARACTER */ 
-		case SCREEN_SELECT_CHARACTER:
+		case SCREEN_SELECT_CHARACTER: select_character_update(game);
 		break;
 
 		/* Screen SELECT LOCATION */ 
-		case SCREEN_SELECT_LOCATION:
+		case SCREEN_SELECT_LOCATION: select_location_update(game);
 		break;
 
 		/* Screen BATTLE */ 
-		case SCREEN_BATTLE:
+		case SCREEN_BATTLE: battle_update(game);
 		break;
 
 		/* Screen BATTLE RESULT */ 
-		case SCREEN_BATTLE_RESULT:
+		case SCREEN_BATTLE_RESULT: battle_result_update(game);
 		break;
 
 		/* If the screen is not selected */
@@ -130,19 +135,19 @@ void game_render(Game *game) {
 		break;
 
 		/* Screen SELECT CHARACTER */ 
-		case SCREEN_SELECT_CHARACTER:
+		case SCREEN_SELECT_CHARACTER: select_character_render(game);
 		break;
 
 		/* Screen SELECT LOCATION */ 
-		case SCREEN_SELECT_LOCATION:
+		case SCREEN_SELECT_LOCATION: select_location_render(game);
 		break;
 
 		/* Screen BATTLE */ 
-		case SCREEN_BATTLE:
+		case SCREEN_BATTLE: battle_render(game);
 		break;
 
 		/* Screen BATTLE RESULT */ 
-		case SCREEN_BATTLE_RESULT:
+		case SCREEN_BATTLE_RESULT: battle_result_render(game);
 		break;
 
 		/* If the screen is not selected */

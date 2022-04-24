@@ -6,6 +6,11 @@
 #define SCREEN_HEIGHT 540
 #define FPS 60
 
+/* Struct rect */
+typedef struct Rect {
+	int x, y, w, h;
+} Rect;
+
 /* Prototypes */
 
 /* Check collision */ 
