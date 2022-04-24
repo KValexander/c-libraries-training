@@ -4,13 +4,19 @@
 /* Constants */
 #define MAX_FRAMES 10
 
+/* Include libraries */
+#include <raylib.h>
+
 /* Include files */
+#include "common.h"
 #include "storage/frame.h"
 
 /* Struct Animation */ 
 typedef struct Animation {
 
 	char name[255]; // animation name
+	Texture2D *texture; // texture
+	Position start; // start animation on texture
 
 	/* Frames */ 
 	int count_frames; // count frames

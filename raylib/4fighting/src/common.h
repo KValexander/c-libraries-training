@@ -6,7 +6,12 @@
 #define SCREEN_HEIGHT 540
 #define FPS 60
 
-/* Struct rect */
+/* Struct Position */
+typedef struct Position {
+	int x, y;
+} Position;
+
+/* Struct Rect */
 typedef struct Rect {
 	int x, y, w, h;
 } Rect;
