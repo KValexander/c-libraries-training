@@ -15,8 +15,8 @@
 typedef struct Animation {
 
 	char name[255]; // animation name
+	int time; // animation time
 	Texture2D *texture; // texture
-	Position start; // start animation on texture
 
 	/* Frames */ 
 	int count_frames; // count frames

@@ -6,6 +6,8 @@
 #define MAX_LOCATIONS 10
 
 /* Include files */
+#include "common.h"
+#include "resources.h"
 #include "storage/character.h"
 // #include "storage/location.h"
 
@@ -22,5 +24,11 @@ typedef struct Storage {
 } Storage;
 
 /* Prototypes */
+
+/* Load storage */
+extern void load_storage(Resources *resources, Storage *storage);
+
+/* Create frame */ 
+extern Frame s_create_frame(int pw, int ph, int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2);
 
 #endif

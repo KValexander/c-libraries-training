@@ -26,6 +26,9 @@ void game_init(Game *game) {
 	/* Load resources */
 	load_resources(&game->resources);
 
+	/* Load storage */
+	load_storage(&game->resources, &game->storage);
+
 	/* Time */
 	game->total_frame = 0; // total time
 	game->screen_frame = 0; // screen time

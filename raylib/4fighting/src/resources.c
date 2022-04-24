@@ -13,8 +13,8 @@ void load_resources(Resources *resources) {
 	resources->count_textures = 0; // count textures
 
 	/* Load textures */
-	r_load_texture(resources, "logo", "assets/logo.png"); // logo
 	r_load_texture(resources, "intro", "assets/intro.png"); // intro
+	r_load_texture(resources, "character_aya", "assets/aya.png"); // aya
 
 }
 
@@ -22,8 +22,8 @@ void load_resources(Resources *resources) {
 void unload_resources(Resources *resources) {
 
 	/* Unload textures */
-	r_unload_texture(resources, "logo"); // logo
 	r_unload_texture(resources, "intro"); // logo
+	r_unload_texture(resources, "character_aya"); // aya
 
 }
 
