@@ -11,6 +11,6 @@ typedef struct Frame {
 } Frame;
 
 /* Prototypes */
-extern Frame create_frame(Rect frame_display, Rect frame_hitbox);
+extern Frame create_frame(int pw, int ph, int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2);
 
 #endif
