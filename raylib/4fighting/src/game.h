@@ -9,14 +9,15 @@
 /* Include files */
 #include "resources.h"
 #include "storage.h"
+#include "battle.h"
 
 /* Enum GameScreen */
 typedef enum GameScreen{
 	SCREEN_LOGO = 0,
 	SCREEN_SELECT_CHARACTER,
 	SCREEN_SELECT_LOCATION,
-	SCREEN_BATTLE,
-	SCREEN_BATTLE_RESULT
+	SCREEN_FIGHT,
+	SCREEN_FIGHT_RESULT
 } GameScreen;
 
 /* Struct Game */
@@ -27,6 +28,7 @@ typedef struct Game {
 
 	Resources resources; // struct Resources
 	Storage storage; // struct storage
+	Battle battle; // struct Battle
 } Game;
 
 /* Prototypes */

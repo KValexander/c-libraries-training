@@ -16,7 +16,7 @@ typedef struct Animation {
 
 	char name[255]; // animation name
 	int time; // animation time
-	Texture2D *texture; // texture
+	Position start; // animation start position on the texture
 
 	/* Frames */ 
 	int count_frames; // count frames
@@ -24,5 +24,9 @@ typedef struct Animation {
 	Frame frames[MAX_FRAMES]; // animation frames
 
 } Animation;
+
+/* Prototypes */
+/* Create animation */ 
+extern Animation create_animation(char *name, int time, int count_frames, Frame frames[MAX_FRAMES], int x, int y);
 
 #endif

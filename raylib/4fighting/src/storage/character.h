@@ -2,20 +2,22 @@
 #define CHARACTER_H_
 
 /* Constants */
-#define MAX_ANIMATIONS 10 
+#define MAX_ANIMATIONS 10
+
+/* Include libraries */
+#include <raylib.h>
 
 /* Include files */
+#include "resources/texture.h"
 #include "storage/animation.h"
 
 /* Struct Character */ 
 typedef struct Character {
 	char name[255]; // character name
-	
-	float x, y; // position
-	float dx, dy; // acc
 
-	int direction; // direction
-	int is_jump; // is jump
+	/* Textures */
+	MyTexture sprite;
+	MyTexture icon;
 
 	/* Animations */
 	int count_animations; // count_animations
@@ -24,7 +26,8 @@ typedef struct Character {
 } Character;
 
 /* Prototypes */
-extern Character create_character(); // load character
-extern void c_create_animation(Character *character); // load animation
+
+/* Create character */ 
+extern Character create_character(char *name, MyTexture icon, MyTexture sprite, int count_animations, Animation animations[MAX_ANIMATIONS]);
 
 #endif

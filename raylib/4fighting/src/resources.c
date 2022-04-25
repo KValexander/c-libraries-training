@@ -15,6 +15,7 @@ void load_resources(Resources *resources) {
 	/* Load textures */
 	r_load_texture(resources, "intro", "assets/intro.png"); // intro
 	r_load_texture(resources, "character_aya", "assets/aya.png"); // aya
+	r_load_texture(resources, "icon_aya", "assets/aya_icon.png"); // aya icon
 
 }
 
@@ -24,6 +25,7 @@ void unload_resources(Resources *resources) {
 	/* Unload textures */
 	r_unload_texture(resources, "intro"); // logo
 	r_unload_texture(resources, "character_aya"); // aya
+	r_unload_texture(resources, "icon_aya"); // aya icon
 
 }
 

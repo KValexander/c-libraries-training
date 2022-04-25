@@ -24,7 +24,11 @@ typedef struct Storage {
 } Storage;
 
 /* Prototypes */
+
 /* Load storage */
 extern void load_storage(Resources *resources, Storage *storage);
+
+/* Create character */ 
+void s_create_character(Storage *storage, char *name, MyTexture icon, MyTexture sprite, int count_animations, Animation animations[MAX_ANIMATIONS]);
 
 #endif

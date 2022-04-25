@@ -12,8 +12,8 @@
 #include "screens/logo.h"
 #include "screens/select_character.h"
 #include "screens/select_location.h"
-#include "screens/battle.h"
-#include "screens/battle_result.h"
+#include "screens/fight.h"
+#include "screens/fight_result.h"
 
 
 /* Game initialization */
@@ -75,13 +75,13 @@ void game_change_screen(Game *game, int screen) {
 			game->c_screen = screen;
 		break;
 
-		/* Screen BATTLE */ 
-		case SCREEN_BATTLE: battle_entry(game);
+		/* Screen FIGHT */ 
+		case SCREEN_FIGHT: fight_entry(game);
 			game->c_screen = screen; 
 		break;
 
-		/* Screen BATTLE RESULT */ 
-		case SCREEN_BATTLE_RESULT: battle_result_entry(game);
+		/* Screen FIGHT RESULT */ 
+		case SCREEN_FIGHT_RESULT: fight_result_entry(game);
 			game->c_screen = screen;
 		break;
 
@@ -111,12 +111,12 @@ void game_update(Game *game) {
 		case SCREEN_SELECT_LOCATION: select_location_update(game);
 		break;
 
-		/* Screen BATTLE */ 
-		case SCREEN_BATTLE: battle_update(game);
+		/* Screen FIGHT */ 
+		case SCREEN_FIGHT: fight_update(game);
 		break;
 
-		/* Screen BATTLE RESULT */ 
-		case SCREEN_BATTLE_RESULT: battle_result_update(game);
+		/* Screen FIGHT RESULT */ 
+		case SCREEN_FIGHT_RESULT: fight_result_update(game);
 		break;
 
 		/* If the screen is not selected */
@@ -145,12 +145,12 @@ void game_render(Game *game) {
 		case SCREEN_SELECT_LOCATION: select_location_render(game);
 		break;
 
-		/* Screen BATTLE */ 
-		case SCREEN_BATTLE: battle_render(game);
+		/* Screen FIGHT */ 
+		case SCREEN_FIGHT: fight_render(game);
 		break;
 
-		/* Screen BATTLE RESULT */ 
-		case SCREEN_BATTLE_RESULT: battle_result_render(game);
+		/* Screen FIGHT RESULT */ 
+		case SCREEN_FIGHT_RESULT: fight_result_render(game);
 		break;
 
 		/* If the screen is not selected */
