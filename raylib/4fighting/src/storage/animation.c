@@ -8,7 +8,6 @@
 /* Include files */
 #include "storage/animation.h"
 
-
 /* Create animation */
 Animation create_animation(char *name, int time, int count_frames, Frame frames[MAX_FRAMES], int x, int y) {
 
@@ -36,9 +35,26 @@ Animation create_animation(char *name, int time, int count_frames, Frame frames[
 
 }
 
-/* Create animation with frames */
-Animation create_animation_with_frames(char *name, int time, int count_frames, int x, int y) {
+/* Animation play */
+void animation_play(Animation *animation, int time) {
 
+	/* Current frame */ 
+	if(time % animation->time == 0) {
+		animation->current_frame = (animation->current_frame < animation->count_frames - 1)
+									? ++animation->current_frame : 0;
+	}
 
+}
 
+/* Animation display */
+Rect animation_display(Animation *animation) {
+
+	Rect display = {
+		animation->start.x + animation->frames[animation->current_frame].display.x, 
+		animation->start.y + animation->frames[animation->current_frame].display.y,
+		animation->frames[animation->current_frame].display.w,
+		animation->frames[animation->current_frame].display.h
+	};
+
+	return display;
 }

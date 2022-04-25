@@ -29,12 +29,16 @@ void game_init(Game *game) {
 	/* Load storage */
 	load_storage(&game->resources, &game->storage);
 
+	/* Battle initialization */
+	battle_init(&game->battle); 
+
 	/* Time */
 	game->total_frame = 0; // total time
 	game->screen_frame = 0; // screen time
 
 	/* Current screen */ 
-	game_change_screen(game, SCREEN_LOGO);
+	// game_change_screen(game, SCREEN_LOGO);
+	game_change_screen(game, SCREEN_SELECT_CHARACTER);
 
 }
 

@@ -29,6 +29,9 @@ typedef struct Storage {
 extern void load_storage(Resources *resources, Storage *storage);
 
 /* Create character */ 
-void s_create_character(Storage *storage, char *name, MyTexture icon, MyTexture sprite, int count_animations, Animation animations[MAX_ANIMATIONS]);
+extern void s_create_character(Storage *storage, char *name, MyTexture icon, MyTexture sprite, int count_animations, Animation animations[MAX_ANIMATIONS]);
+
+/* Get character */ 
+extern Character s_get_character(Storage *storage, int index);
 
 #endif

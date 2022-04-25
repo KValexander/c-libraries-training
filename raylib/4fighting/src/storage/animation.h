@@ -29,4 +29,10 @@ typedef struct Animation {
 /* Create animation */ 
 extern Animation create_animation(char *name, int time, int count_frames, Frame frames[MAX_FRAMES], int x, int y);
 
+/* Animation play */
+extern void animation_play(Animation *animation, int time);
+
+/* Animation display */
+extern Rect animation_display(Animation *animation);
+
 #endif

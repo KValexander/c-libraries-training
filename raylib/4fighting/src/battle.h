@@ -6,7 +6,7 @@
 
 /* Include files */
 #include "storage.h"
-#include "battle/player.c"
+#include "battle/player.h"
 
 /* Struct Battle */ 
 typedef struct Battle {
@@ -16,6 +16,7 @@ typedef struct Battle {
 } Battle;
 
 /* Prototypes */
+extern void battle_init(Battle *battle);
 
 
 #endif

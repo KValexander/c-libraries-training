@@ -36,9 +36,9 @@ void load_storage(Resources *resources, Storage *storage) {
 	frames[4] = create_frame(pw, ph, 0, 0, 60, 103, 13, 8, 44, 95); pw += 60;
 	frames[5] = create_frame(pw, ph, 0, 0, 60, 103, 14, 8, 42, 95); pw += 60;
 	frames[6] = create_frame(pw, ph, 0, 0, 58, 103, 10, 8, 44, 95); pw += 58;
-	frames[7] = create_frame(pw, ph, 0, 0, 58, 103, 16, 8, 40, 95); pw = 0;
+	frames[7] = create_frame(pw, ph, 0, 0, 60, 103, 16, 8, 40, 95); pw = 0;
 	/* Create animation */
-	animations[0] = create_animation("idle", 10, 8, frames, 8, 40);
+	animations[0] = create_animation("idle", 5, 8, frames, 8, 40);
 
 	/* MOVE */
 	/* Create frames */
@@ -47,11 +47,11 @@ void load_storage(Resources *resources, Storage *storage) {
 	frames[2] = create_frame(pw, ph, 0, 0, 68, 102, 19, 8, 32, 94); pw += 68;
 	frames[3] = create_frame(pw, ph, 0, 0, 57, 102, 15, 8, 34, 94); pw += 57;
 	frames[4] = create_frame(pw, ph, 0, 0, 53, 102, 14, 8, 32, 94); pw += 53;
-	frames[5] = create_frame(pw, ph, 0, 0, 62, 102, 13, 8, 40, 94); pw += 32;
+	frames[5] = create_frame(pw, ph, 0, 0, 62, 102, 13, 8, 40, 94); pw += 62;
 	frames[6] = create_frame(pw, ph, 0, 0, 69, 102, 19, 8, 40, 94); pw += 69;
 	frames[7] = create_frame(pw, ph, 0, 0, 55, 102, 14, 8, 32, 94); pw = 0;
 	/* Create animation */
-	animations[1] = create_animation("move", 10, 8, frames, 8, 224);
+	animations[1] = create_animation("move", 5, 8, frames, 8, 224);
 
 	/* Create character */
 	s_create_character(storage, "aya", my_icon, my_sprite, 2, animations);
@@ -64,6 +64,7 @@ void s_create_character(Storage *storage, char *name, MyTexture icon, MyTexture 
 }
 
 /* Get character */
-void s_get_character(Storage *storage, char *name) {
-
+Character s_get_character(Storage *storage, int index) {
+	for(int i = 0; i < storage->count_characters; i++)
+		if(i == index) return storage->characters[i];
 }

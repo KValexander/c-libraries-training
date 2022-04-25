@@ -2,7 +2,6 @@
 #define GAME_H_
 
 /* Constants */
-#define MAX_PLAYERS 2
 #define MAX_CHARACTERS 10
 #define MAX_LOCATIONS 10
 
