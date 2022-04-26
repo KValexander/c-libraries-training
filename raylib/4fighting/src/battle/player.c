@@ -27,7 +27,8 @@ void player_init(Player *player, int control) {
 	/* States */ 
 	player->state = ANIMATION_IDLE;
 	player->prev_state = ANIMATION_IDLE;
-	player->direction = (control) ? ANIMATION_RIGHT : ANIMATION_LEFT;
+	player->direction = ANIMATION_RIGHT;
+	player->prev_direction = ANIMATION_RIGHT;
 	player->is_jump = 0;
 	player->is_change = 0;
 
@@ -37,10 +38,12 @@ void player_init(Player *player, int control) {
 void player_update(Player *player) {
 
 	/* Check change */ 
-	if(player->state != player->prev_state) {
+	if(player->direction != player->prev_direction || player->state != player->prev_state) {
+		player->prev_direction = player->direction;
 		player->prev_state = player->state;
 		player->is_change = 1;
 	}
+
 
 	/* KEYDOWN */ 
 	if(player->control) {

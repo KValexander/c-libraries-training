@@ -37,11 +37,11 @@ void select_character_update(Game *game) {
 		for(int i = 0; i < game->storage.count_characters; i++) {
 			if(check_collision(
 				sc_mouse.x, sc_mouse.y,
-				40, 100 + 84*i,
+				40, 100 + 64*i,
 				1, 1,
 				game->storage.characters[i].icon.w,
 				game->storage.characters[i].icon.h
-			)) game->battle.player[0].character = i;
+			)) {game->battle.player[0].character = i; break;}
 			else game->battle.player[0].character = -1;
 		}
 	}
@@ -56,9 +56,9 @@ void select_character_render(Game *game) {
 
 	/* Drawing character selection */ 
 	for(int i = 0; i < game->storage.count_characters; i++) {
-		DrawTexture(game->storage.characters[i].icon.texture, 40, 100 + 84*i, WHITE);
+		DrawTexture(game->storage.characters[i].icon.texture, 40, 100 + 64*i, WHITE);
 		if(game->battle.player[0].character == i)
-			DrawRectangleLines(30, 90 + 84*i, 68, 68, DARKBLUE);
+			DrawRectangleLines(30, 90 + 64*i, 68, 68, DARKBLUE);
 	}
 
 	/* Draw selected character */ 

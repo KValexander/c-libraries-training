@@ -17,6 +17,7 @@ void fight_entry(Game *game) {
 
 	game->battle.player[1].x = SCREEN_WIDTH - 100;
 	game->battle.player[1].y = 300;
+	game->battle.player[1].direction = ANIMATION_LEFT;
 
 }
 

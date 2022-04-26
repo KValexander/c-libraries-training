@@ -14,6 +14,7 @@ typedef struct Player {
 	AnimationState state; // animation state
 	AnimationState prev_state; // previous animation state
 	AnimationDirection direction; // direction
+	AnimationDirection prev_direction; // previous direction
 
 	int control; // player control
 

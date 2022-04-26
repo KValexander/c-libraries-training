@@ -52,7 +52,6 @@ void character_update(Character *character, int *is_change, AnimationState state
 
 	/* Change animation */
 	if(*is_change) {
-		printf("%d - %d - %d\n", state, direction, state + direction);
 		character_change_animation(character, state + direction);
 		*is_change = 0;
 	}
