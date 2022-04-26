@@ -14,7 +14,7 @@ static Vector2 sc_mouse; // mouse position
 /* Select character screen entry */
 void select_character_entry(Game *game) {
 	game->battle.player[0].character = -1; // selected character
-
+	game->battle.player[1].character = -1; // selected character
 }
 
 /* Select character screen update */
@@ -25,9 +25,12 @@ void select_character_update(Game *game) {
 	if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
 		
 		/* Go to next screen*/
-		if(game->battle.player[0].character >= 0)
-			if(check_collision(sc_mouse.x, sc_mouse.y, SCREEN_WIDTH - 170, 30, 1, 1, 114, 40))
+		if(game->battle.player[0].character >= 0) {
+			if(check_collision(sc_mouse.x, sc_mouse.y, SCREEN_WIDTH - 170, 30, 1, 1, 114, 40)) {
+				game->battle.player[1].character = !game->battle.player[0].character;
 				return game_change_screen(game, SCREEN_FIGHT);
+			}
+		}
 
 
 		/* Select character */ 
@@ -60,7 +63,7 @@ void select_character_render(Game *game) {
 
 	/* Draw selected character */ 
 	if(game->battle.player[0].character >= 0) {
-		DrawTexture(game->storage.characters[game->battle.player[0].character].sprite.texture, 200, 100, WHITE);
+		DrawTexture(game->storage.characters[game->battle.player[0].character].view.texture, 200, 100, WHITE);
 		DrawRectangle(SCREEN_WIDTH - 170, 30, 114, 40, BLACK);
 		DrawText("Next", SCREEN_WIDTH - 150, 35, 32, WHITE);
 	}

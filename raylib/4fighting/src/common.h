@@ -6,6 +6,21 @@
 #define SCREEN_HEIGHT 540
 #define FPS 60
 
+/* Enum AnimationState */
+typedef enum AnimationState {
+	ANIMATION_IDLE = 0,
+	ANIMATION_MOVE = 2,
+	ANIMATION_JUMP,
+	ANIMATION_DOWN,
+	ANIMATION_ATTACK,
+} AnimationState;
+
+/* Enum AnimationDirection */ 
+typedef enum AnimationDirection {
+	ANIMATION_RIGHT = 0,
+	ANIMATION_LEFT
+} AnimationDirection;
+
 /* Struct Position */
 typedef struct Position {
 	int x, y;

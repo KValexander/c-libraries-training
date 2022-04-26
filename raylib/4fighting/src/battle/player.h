@@ -1,6 +1,9 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 
+/* Include files */
+#include "common.h"
+
 /* Struct Player */ 
 typedef struct Player {
 	int character; // selected character
@@ -8,15 +11,18 @@ typedef struct Player {
 	float x, y; // position
 	float dx, dy; // acceleration
 
-	int state; // state
-	int prev_state; // previous state
-	int direction; // direction
+	AnimationState state; // animation state
+	AnimationState prev_state; // previous animation state
+	AnimationDirection direction; // direction
+
+	int control; // player control
+
 	int is_jump; // is jump
 	int is_change; // is change
 } Player;
 
 /* Prototypes */
-extern void player_init(Player *player);
+extern void player_init(Player *player, int control);
 
 // extern void player_down(Player *player);
 // extern void player_jump(Player *player);
@@ -25,5 +31,7 @@ extern void player_init(Player *player);
 // extern void player_attack(Player *player);
 
 extern void player_update(Player *player); 
+
+extern void player_ai(Player *player);
 
 #endif

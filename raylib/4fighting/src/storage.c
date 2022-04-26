@@ -15,17 +15,18 @@ void load_storage(Resources *resources, Storage *storage) {
 	storage->count_locations = 0; // count locations
 
 	/* Helpers */
-	MyTexture my_sprite;
 	MyTexture my_icon;
+	MyTexture my_view;
+	MyTexture my_sprite;
 	Frame frames[MAX_FRAMES];
 	Animation animations[MAX_ANIMATIONS];
 	int pw = 0, ph = 0;
 
-	/* Load characters */
-
+	/* Load character AYA */
 	/* Load textures */
-	my_sprite = r_get_texture(resources, "character_aya");
-	my_icon = r_get_texture(resources, "icon_aya");
+	my_icon = r_get_texture(resources, "aya_icon");
+	my_view = r_get_texture(resources, "aya_view");
+	my_sprite = r_get_texture(resources, "aya_sprite");
 
 	/* IDLE */
 	/* Create frames */
@@ -34,9 +35,9 @@ void load_storage(Resources *resources, Storage *storage) {
 	frames[2] = create_frame(pw, ph, 0, 0, 58, 103, 14, 8, 40, 95); pw += 58;
 	frames[3] = create_frame(pw, ph, 0, 0, 58, 103, 12, 8, 46, 95); pw += 58;
 	frames[4] = create_frame(pw, ph, 0, 0, 60, 103, 13, 8, 44, 95); pw += 60;
-	frames[5] = create_frame(pw, ph, 0, 0, 60, 103, 14, 8, 42, 95); pw += 60;
-	frames[6] = create_frame(pw, ph, 0, 0, 58, 103, 10, 8, 44, 95); pw += 58;
-	frames[7] = create_frame(pw, ph, 0, 0, 60, 103, 16, 8, 40, 95); pw = 0;
+	frames[5] = create_frame(pw, ph, 0, 0, 58, 103, 14, 8, 42, 95); pw += 58;
+	frames[6] = create_frame(pw, ph, 0, 0, 60, 103, 10, 8, 44, 95); pw += 60;
+	frames[7] = create_frame(pw, ph, 0, 0, 58, 103, 16, 8, 40, 95); pw = 0;
 	/* Create animation */
 	animations[0] = create_animation("idle", 5, 8, frames, 8, 40);
 
@@ -51,16 +52,75 @@ void load_storage(Resources *resources, Storage *storage) {
 	frames[6] = create_frame(pw, ph, 0, 0, 69, 102, 19, 8, 40, 94); pw += 69;
 	frames[7] = create_frame(pw, ph, 0, 0, 55, 102, 14, 8, 32, 94); pw = 0;
 	/* Create animation */
-	animations[1] = create_animation("move", 5, 8, frames, 8, 224);
+	animations[2] = create_animation("move", 5, 8, frames, 8, 224);
 
-	/* Create character */
-	s_create_character(storage, "aya", my_icon, my_sprite, 2, animations);
+	/* Create character AYA */
+	s_create_character(storage, "aya", my_icon, my_view, my_sprite, 2, animations);
+
+	/* Load character SAKUYA */
+	my_icon = r_get_texture(resources, "sakuya_icon");
+	my_view = r_get_texture(resources, "sakuya_view");
+	my_sprite = r_get_texture(resources, "sakuya_sprite");
+
+	/* IDLE */
+	/* Create frames */
+	frames[0] = create_frame(pw, ph, 0, 0, 54, 97, 0, 0, 0, 0); pw += 54;
+	frames[1] = create_frame(pw, ph, 0, 0, 54, 97, 0, 0, 0, 0); pw += 54;
+	frames[2] = create_frame(pw, ph, 0, 0, 53, 97, 0, 0, 0, 0); pw += 53;
+	frames[3] = create_frame(pw, ph, 0, 0, 54, 97, 0, 0, 0, 0); pw += 54;
+	frames[4] = create_frame(pw, ph, 0, 0, 53, 97, 0, 0, 0, 0); pw += 53;
+	frames[5] = create_frame(pw, ph, 0, 0, 53, 97, 0, 0, 0, 0); pw = 0;
+	/* Create animation */
+	animations[0] = create_animation("idle", 7, 6, frames, 8, 40);
+
+	/* IDLE BACK */
+	/* Create frames */
+	frames[0] = create_frame(pw, ph, 0, 0, 54, 97, 0, 0, 0, 0); pw += 54;
+	frames[1] = create_frame(pw, ph, 0, 0, 54, 97, 0, 0, 0, 0); pw += 54;
+	frames[2] = create_frame(pw, ph, 0, 0, 53, 97, 0, 0, 0, 0); pw += 53;
+	frames[3] = create_frame(pw, ph, 0, 0, 54, 97, 0, 0, 0, 0); pw += 54;
+	frames[4] = create_frame(pw, ph, 0, 0, 53, 97, 0, 0, 0, 0); pw += 53;
+	frames[5] = create_frame(pw, ph, 0, 0, 53, 97, 0, 0, 0, 0); pw = 0;
+	/* Create animation */
+	animations[1] = create_animation("idle", 7, 6, frames, 8, 40);
+
+	/* MOVE */
+	/* Create frames */
+	frames[0] = create_frame(pw, ph, 0, 0, 48, 98, 0, 0, 0, 0); pw += 48;
+	frames[1] = create_frame(pw, ph, 0, 0, 49, 98, 0, 0, 0, 0); pw += 49;
+	frames[2] = create_frame(pw, ph, 0, 0, 46, 98, 0, 0, 0, 0); pw += 46;
+	frames[3] = create_frame(pw, ph, 0, 0, 49, 98, 0, 0, 0, 0); pw += 49;
+	frames[4] = create_frame(pw, ph, 0, 0, 51, 98, 0, 0, 0, 0); pw += 51;
+	frames[5] = create_frame(pw, ph, 0, 0, 50, 98, 0, 0, 0, 0); pw += 50;
+	frames[6] = create_frame(pw, ph, 0, 0, 48, 98, 0, 0, 0, 0); pw += 48;
+	frames[7] = create_frame(pw, ph, 0, 0, 48, 98, 0, 0, 0, 0); pw += 48;
+	frames[8] = create_frame(pw, ph, 0, 0, 47, 98, 0, 0, 0, 0); pw = 0;
+	/* Create animation */
+	animations[2] = create_animation("move", 5, 9, frames, 8, 224);
+
+	/* MOVE BACK */
+	/* Create frames */
+	frames[0] = create_frame(pw, ph, 0, 0, 48, 98, 0, 0, 0, 0); pw += 48;
+	frames[1] = create_frame(pw, ph, 0, 0, 46, 98, 0, 0, 0, 0); pw += 46;
+	frames[2] = create_frame(pw, ph, 0, 0, 46, 98, 0, 0, 0, 0); pw += 46;
+	frames[3] = create_frame(pw, ph, 0, 0, 49, 98, 0, 0, 0, 0); pw += 49;
+	frames[4] = create_frame(pw, ph, 0, 0, 51, 98, 0, 0, 0, 0); pw += 51;
+	frames[5] = create_frame(pw, ph, 0, 0, 50, 98, 0, 0, 0, 0); pw += 50;
+	frames[6] = create_frame(pw, ph, 0, 0, 48, 98, 0, 0, 0, 0); pw += 48;
+	frames[7] = create_frame(pw, ph, 0, 0, 48, 98, 0, 0, 0, 0); pw += 48;
+	frames[8] = create_frame(pw, ph, 0, 0, 49, 98, 0, 0, 0, 0); pw = 0;
+	/* Create animation */
+	animations[3] = create_animation("move_back", 5, 9, frames, 508, 224);
+
+	/* Create character SAKUYA */
+	s_create_character(storage, "sakuya", my_icon, my_view, my_sprite, 2, animations);
+
 
 }
 
 /* create character */
-void s_create_character(Storage *storage, char *name, MyTexture icon, MyTexture sprite, int count_animations, Animation animations[MAX_ANIMATIONS]) {
-	storage->characters[storage->count_characters++] = create_character(name, icon, sprite, count_animations, animations);
+void s_create_character(Storage *storage, char *name, MyTexture icon, MyTexture view, MyTexture sprite, int count_animations, Animation animations[MAX_ANIMATIONS]) {
+	storage->characters[storage->count_characters++] = create_character(name, icon, view, sprite, count_animations, animations);
 }
 
 /* Get character */

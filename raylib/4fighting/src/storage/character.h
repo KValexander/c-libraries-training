@@ -17,8 +17,9 @@ typedef struct Character {
 	char name[255]; // character name
 
 	/* Textures */
-	MyTexture sprite;
 	MyTexture icon;
+	MyTexture view;
+	MyTexture sprite;
 
 	/* Animations */
 	int count_animations; // count_animations
@@ -30,13 +31,13 @@ typedef struct Character {
 /* Prototypes */
 
 /* Create character */ 
-extern Character create_character(char *name, MyTexture icon, MyTexture sprite, int count_animations, Animation animations[MAX_ANIMATIONS]);
+extern Character create_character(char *name, MyTexture icon, MyTexture view, MyTexture sprite, int count_animations, Animation animations[MAX_ANIMATIONS]);
 
 /* Change animation */
 extern void character_change_animation(Character *character, int change);
 
 /* Character update */ 
-extern void character_update(Character *character, Player *player, int time);
+extern void character_update(Character *character, int *is_change, AnimationState state, AnimationDirection direction, int time);
 
 /* Character draw */
 extern void character_draw(Character *character, int x, int y);

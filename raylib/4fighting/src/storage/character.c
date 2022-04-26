@@ -11,7 +11,7 @@
 
 
 /* Create character */
-Character create_character(char *name, MyTexture icon, MyTexture sprite, int count_animations, Animation animations[MAX_ANIMATIONS]) {
+Character create_character(char *name, MyTexture icon, MyTexture view, MyTexture sprite, int count_animations, Animation animations[MAX_ANIMATIONS]) {
 
 	/* Create character */ 
 	Character character;
@@ -21,6 +21,7 @@ Character create_character(char *name, MyTexture icon, MyTexture sprite, int cou
 
 	/* Textures */
 	character.icon = icon;
+	character.view = view;
 	character.sprite = sprite;
 
 	/* Animations */
@@ -35,24 +36,25 @@ Character create_character(char *name, MyTexture icon, MyTexture sprite, int cou
 }
 
 /* Change animation */
-void character_change_animation(Character *character, int change) {
+void character_change_animation(Character *character, int state) {
 
 	/* Checking for animation existence */ 
-	if(change < 0 || change >= character->count_animations) return;
+	if(state < 0 || state >= character->count_animations) return;
 
 	/* Change current animation */ 
-	character->current_animation = change;
+	character->current_animation = state;
 	character->animations[character->current_animation].current_frame = 0;
 
 } 
 
 /* Character update */
-void character_update(Character *character, Player *player, int time) {
+void character_update(Character *character, int *is_change, AnimationState state, AnimationDirection direction, int time) {
 
 	/* Change animation */
-	if(player->is_change) {
-		character_change_animation(character, player->state);
-		player->is_change = 0;
+	if(*is_change) {
+		printf("%d - %d - %d\n", state, direction, state + direction);
+		character_change_animation(character, state + direction);
+		*is_change = 0;
 	}
 
 	/* Animation play */ 

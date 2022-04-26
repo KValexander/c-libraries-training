@@ -10,21 +10,24 @@
 
 
 /* Player initialization */
-void player_init(Player *player) {
+void player_init(Player *player, int control) {
 
 	/* Selected character */ 
-	player->character = -1;
+	player->character = 0;
 
 	/* Data */ 
 	player->x = 0;
 	player->y = 0;
 	player->dx = 0;
 	player->dy = 0;
+
+	/* Control */
+	player->control = control;
 		
 	/* States */ 
-	player->state = 0;
-	player->prev_state = 0;
-	player->direction = 0;
+	player->state = ANIMATION_IDLE;
+	player->prev_state = ANIMATION_IDLE;
+	player->direction = (control) ? ANIMATION_RIGHT : ANIMATION_LEFT;
 	player->is_jump = 0;
 	player->is_change = 0;
 
@@ -40,39 +43,51 @@ void player_update(Player *player) {
 	}
 
 	/* KEYDOWN */ 
+	if(player->control) {
 
-	/* RIGHT */
-	if(IsKeyDown(KEY_RIGHT)) {
-		player->state = 1;
-		player->direction = 0;
-		player->dx += 0.5f;
-		if(player->dx > 6)
-			player->dx = 6;
-	}
+		/* RIGHT */
+		if(IsKeyDown(KEY_RIGHT)) {
+			player->state = ANIMATION_MOVE;
+			player->direction = ANIMATION_RIGHT;
+			player->dx += 0.5f;
+			if(player->dx > 6)
+				player->dx = 6;
+		}
 
-	/* LEFT */ 
-	else if(IsKeyDown(KEY_LEFT)) {
-		player->state = 1;
-		player->direction = 1;
-		player->dx -= 0.5f;
-		if(player->dx < -6)
-			player->dx = -6;
-	}
+		/* LEFT */ 
+		else if(IsKeyDown(KEY_LEFT)) {
+			player->state = ANIMATION_MOVE;
+			player->direction = ANIMATION_LEFT;
+			player->dx -= 0.5f;
+			if(player->dx < -6)
+				player->dx = -6;
+		}
 
-	/* IDLE */
-	else {
-		player->state = 0;
-		player->dx *= 0.8f;
-		if(fabsf(player->dx) < 0.1f)
-			player->dx = 0;
-	}
+		/* IDLE */
+		else {
+			player->state = ANIMATION_IDLE;
+			player->dx *= 0.8f;
+			if(fabsf(player->dx) < 0.1f)
+				player->dx = 0;
+		}
 
-	/* DOWN */ 
-	if(IsKeyDown(KEY_DOWN))
-		player->state = 2;
+		/* DOWN */ 
+		if(IsKeyDown(KEY_DOWN))
+			player->state = ANIMATION_DOWN;
+
+	/* Player AI */ 
+	} else player_ai(player);
 
 	/* Player move */
 	player->x += player->dx;
 	player->y += player->dy;
 
+	/* Player state */
+	// player->state = player->state + player->direction; 
+
 }
+
+/* Player AI */
+void player_ai(Player *player) {
+
+} 

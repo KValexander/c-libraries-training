@@ -14,8 +14,12 @@ void load_resources(Resources *resources) {
 
 	/* Load textures */
 	r_load_texture(resources, "intro", "assets/intro.png"); // intro
-	r_load_texture(resources, "character_aya", "assets/aya.png"); // aya
-	r_load_texture(resources, "icon_aya", "assets/aya_icon.png"); // aya icon
+	r_load_texture(resources, "aya_icon", "assets/aya_icon.png"); // aya icon
+	r_load_texture(resources, "aya_view", "assets/aya_view.png"); // aya view
+	r_load_texture(resources, "aya_sprite", "assets/aya_sprite.png"); // aya sprite
+	r_load_texture(resources, "sakuya_icon", "assets/sakuya_icon.png"); // sakuya icon
+	r_load_texture(resources, "sakuya_view", "assets/sakuya_view.png"); // sakuya view
+	r_load_texture(resources, "sakuya_sprite", "assets/sakuya_sprite.png"); // sakuya sprite
 
 }
 
@@ -24,8 +28,12 @@ void unload_resources(Resources *resources) {
 
 	/* Unload textures */
 	r_unload_texture(resources, "intro"); // logo
-	r_unload_texture(resources, "character_aya"); // aya
-	r_unload_texture(resources, "icon_aya"); // aya icon
+	r_unload_texture(resources, "aya_icon"); // aya icon
+	r_unload_texture(resources, "aya_view"); // aya view
+	r_unload_texture(resources, "aya_sprite"); // aya sprite
+	r_unload_texture(resources, "sakuya_icon"); // sakuya icon
+	r_unload_texture(resources, "sakuya_view"); // sakuya view
+	r_unload_texture(resources, "sakuya_sprite"); // sakuya sprite
 
 }
 
