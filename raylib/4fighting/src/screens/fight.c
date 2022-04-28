@@ -12,10 +12,10 @@
 /* Fight screen entry */
 void fight_entry(Game *game) {
 
-	game->battle.player[0].x = 30;
+	game->battle.player[0].x = 70;
 	game->battle.player[0].y = 300;
 
-	game->battle.player[1].x = SCREEN_WIDTH - 100;
+	game->battle.player[1].x = SCREEN_WIDTH - 140;
 	game->battle.player[1].y = 300;
 	game->battle.player[1].direction = ANIMATION_LEFT;
 
@@ -24,37 +24,35 @@ void fight_entry(Game *game) {
 /* Fight screen update */
 void fight_update(Game *game) {
 
-	/* Player update */
-	player_update(&game->battle.player[0]);
+	/* Update players */
+	for(int i = 0; i < MAX_PLAYERS; i++) {
 
-	/* Character update */
-	character_update(&game->storage.characters[game->battle.player[0].character],
-					 &game->battle.player[0].is_change,
-					  game->battle.player[0].state,
-					  game->battle.player[0].direction,
-					  game->screen_frame);
+		/* Player update */ 
+		player_update(&game->battle.player[i]);
+		
+		/* Character update */ 
+		character_update(&game->storage.characters[game->battle.player[i].character],
+						 &game->battle.player[i].is_change,
+						  game->battle.player[i].state,
+						  game->battle.player[i].direction,
+						  game->screen_frame);
 
-	/* Player update */
-	player_update(&game->battle.player[1]);
+		/* Surface-Player collision */
+		// collision_surface_player(game);
 
-	/* Character update */
-	character_update(&game->storage.characters[game->battle.player[1].character],
-					 &game->battle.player[1].is_change,
-					  game->battle.player[1].state,
-					  game->battle.player[1].direction,
-					  game->screen_frame);
+	}
 
 }
 
 /* Fight screen render */
 void fight_render(Game *game) {
 
-	/* Character draw */
-	character_draw(&game->storage.characters[game->battle.player[0].character],
-					game->battle.player[0].x, game->battle.player[0].y);
+	/* Draw location */
+	location_draw(&game->storage.locations[game->battle.selected_location]);
 
-	/* Character draw */
-	character_draw(&game->storage.characters[game->battle.player[1].character],
-					game->battle.player[1].x, game->battle.player[1].y);
+	/* Draw characters */
+	for(int i = 0; i < game->storage.count_characters; i++)
+		character_draw(&game->storage.characters[game->battle.player[i].character],
+						game->battle.player[i].x, game->battle.player[i].y);
 
 }

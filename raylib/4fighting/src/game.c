@@ -8,6 +8,9 @@
 #include "common.h"
 #include "game.h"
 
+/* Collision */
+#include "collision.h"
+
 /* Screens */ 
 #include "screens/logo.h"
 #include "screens/select_character.h"

@@ -39,10 +39,9 @@ Animation create_animation(char *name, int time, int count_frames, Frame frames[
 void animation_play(Animation *animation, int time) {
 
 	/* Current frame */ 
-	if(time % animation->time == 0) {
+	if(time % animation->time == 0)
 		animation->current_frame = (animation->current_frame < animation->count_frames - 1)
 									? ++animation->current_frame : 0;
-	}
 
 }
 

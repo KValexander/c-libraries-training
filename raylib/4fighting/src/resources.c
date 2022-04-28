@@ -14,12 +14,22 @@ void load_resources(Resources *resources) {
 
 	/* Load textures */
 	r_load_texture(resources, "intro", "assets/intro.png"); // intro
+
 	r_load_texture(resources, "aya_icon", "assets/aya_icon.png"); // aya icon
 	r_load_texture(resources, "aya_view", "assets/aya_view.png"); // aya view
 	r_load_texture(resources, "aya_sprite", "assets/aya_sprite.png"); // aya sprite
+
 	r_load_texture(resources, "sakuya_icon", "assets/sakuya_icon.png"); // sakuya icon
 	r_load_texture(resources, "sakuya_view", "assets/sakuya_view.png"); // sakuya view
 	r_load_texture(resources, "sakuya_sprite", "assets/sakuya_sprite.png"); // sakuya sprite
+
+	r_load_texture_resize(resources, "location_1_icon", "assets/location_1.png", 256, 144); // location 1 icon
+	r_load_texture(resources, "location_1_background", "assets/location_1.png"); // location 1 background
+	r_load_texture(resources, "location_1_surface", "assets/location_1_surface.png"); // location 1 surface
+
+	r_load_texture_resize(resources, "location_2_icon", "assets/location_2.png", 256, 144); // location 2 icon
+	r_load_texture(resources, "location_2_background", "assets/location_2.png"); // location 2 background
+	r_load_texture(resources, "location_2_surface", "assets/location_2_surface.png"); // location 2 surface
 
 }
 
@@ -27,13 +37,23 @@ void load_resources(Resources *resources) {
 void unload_resources(Resources *resources) {
 
 	/* Unload textures */
-	r_unload_texture(resources, "intro"); // logo
+	r_unload_texture(resources, "intro"); // intro
+
 	r_unload_texture(resources, "aya_icon"); // aya icon
 	r_unload_texture(resources, "aya_view"); // aya view
 	r_unload_texture(resources, "aya_sprite"); // aya sprite
+
 	r_unload_texture(resources, "sakuya_icon"); // sakuya icon
 	r_unload_texture(resources, "sakuya_view"); // sakuya view
 	r_unload_texture(resources, "sakuya_sprite"); // sakuya sprite
+
+	r_unload_texture(resources, "location_1_icon"); // location 1 icon
+	r_unload_texture(resources, "location_1_background"); // location 1 background
+	r_unload_texture(resources, "location_1_surface"); // location 1 surface
+
+	r_unload_texture(resources, "location_2_icon"); // location 2 icon
+	r_unload_texture(resources, "location_2_background"); // location 2 background
+	r_unload_texture(resources, "location_2_surface"); // location 2 surface
 
 }
 
