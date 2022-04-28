@@ -57,3 +57,8 @@ Rect animation_display(Animation *animation) {
 
 	return display;
 }
+
+/* Get current frame */
+Frame get_current_frame(Animation *animation) {
+	return animation->frames[animation->current_frame];
+}

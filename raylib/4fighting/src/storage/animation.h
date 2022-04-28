@@ -35,4 +35,7 @@ extern void animation_play(Animation *animation, int time);
 /* Animation display */
 extern Rect animation_display(Animation *animation);
 
+/* Get current frame */
+extern Frame get_current_frame(Animation *animation);
+
 #endif

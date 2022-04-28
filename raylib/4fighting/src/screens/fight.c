@@ -7,6 +7,7 @@
 /* Include files */
 #include "common.h"
 #include "game.h"
+#include "collision.h"
 #include "screens/fight.h"
 
 /* Fight screen entry */

@@ -75,3 +75,8 @@ void character_draw(Character *character, int x, int y) {
 	);
 
 }
+
+/* Get current animation */
+Animation get_current_animation(Character *character) {
+	return character->animations[character->current_animation];
+} 

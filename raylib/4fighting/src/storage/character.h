@@ -42,4 +42,7 @@ extern void character_update(Character *character, int *is_change, AnimationStat
 /* Character draw */
 extern void character_draw(Character *character, int x, int y);
 
+/* Get current animation */
+extern Animation get_current_animation(Character *character);
+
 #endif
