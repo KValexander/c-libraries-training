@@ -1,17 +1,20 @@
-/* Include files */
+/* Include files */ 
+#include "common.h"
 #include "game.h"
 
-int main(void) {
-    Game game;
+/* Game entry point */ 
+int main() {
 
-    /* Initialization */ 
-    game_init(&game);
-    
-    /* Game loop */
-    game_loop(&game);
+	/* Struct Game */ 
+	Game game;
 
-    /* Deinitialization */ 
-    game_deinit(&game);
+	/* Game initialization */ 
+	game_init(&game);
 
-    return 0;
+	/* Game loop */ 
+	game_loop(&game);
+	
+	/* Game deinitialization */ 
+	game_deinit(&game);
+
 }
