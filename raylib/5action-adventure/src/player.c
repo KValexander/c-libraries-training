@@ -16,6 +16,9 @@ Player create_player(Rect rect, Color color, int speed, int *count_tiles, Tile *
 	/* Color */
 	player.color = color; 
 
+	/* Onload texture */
+	player.onload_texture = 0; 
+
 	/* Speed */
 	player.speed = speed;
 
@@ -37,6 +40,14 @@ Player create_player(Rect rect, Color color, int speed, int *count_tiles, Tile *
 	/* Return player */
 	return player;
 
+}
+
+/* Give texture */
+void player_give_texture(Player *player, MyTexture texture) {
+	player->texture = texture;
+	player->onload_texture = 1;
+	player->rect.w = player->texture.w;
+	player->rect.h = player->texture.h;
 }
 
 /* Key down */
@@ -91,7 +102,7 @@ void player_collision(Player *player, int direction) {
 		if(!player->tiles[i].collision) return;
 
 		/* Check collide with tile */ 
-		if(collide(player->rect.x, player->rect.y, player->tiles[i].rect.x, player->tiles[i].rect.y, player->rect.w, player->rect.h, player->tiles[i].rect.w, player->tiles[i].rect.h )) {
+		if(collide(player->rect.x, player->rect.y, player->tiles[i].hitbox.x, player->tiles[i].hitbox.y, player->rect.w, player->rect.h, player->tiles[i].hitbox.w, player->tiles[i].hitbox.h )) {
 
 			/* Direction */ 
 			switch(direction) {
@@ -127,7 +138,7 @@ void player_collision(Player *player, int direction) {
 		}
 
 	}
-	
+
 }
 
 
@@ -144,11 +155,22 @@ void player_update(Player *player) {
 
 /* Draw */
 void player_draw(Player *player, Position camera) {
-	DrawRectangle(
-		camera.x + player->rect.x,
-		camera.y + player->rect.y,
-		player->rect.w,
-		player->rect.h,
-		player->color
-	);
+
+	/* Draw texture */
+	if(player->onload_texture)
+		DrawTexture(
+			player->texture.texture,
+			camera.x + player->rect.x,
+			camera.y + player->rect.y,
+			WHITE
+		);
+
+	/* Draw rectangle */
+	else DrawRectangle(
+			camera.x + player->rect.x,
+			camera.y + player->rect.y,
+			player->rect.w,
+			player->rect.h,
+			player->color
+		);
 }

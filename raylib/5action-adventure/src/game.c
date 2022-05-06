@@ -17,8 +17,11 @@ void game_init(Game *game) {
 	/* Randomizer initialization */
 	srand(time(0));
 
+	/* Load textures */
+	load_textures(&game->textures);
+
 	/* Level initialization */
-	level_init(&game->level);
+	level_init(&game->level, &game->textures);
 
 }
 
@@ -62,6 +65,9 @@ void game_loop(Game *game) {
 
 /* Game deinitialization */
 void game_deinit(Game *game) {
+
+	/* Unload textures */
+	unload_textures(&game->textures);
 
 	/* Close window */
 	CloseWindow();

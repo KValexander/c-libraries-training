@@ -6,11 +6,14 @@
 
 /* Include files */
 #include "common.h"
+#include "textures.h"
 #include "level.h"
 
 /* Struct Game */
 typedef struct Game {
 	int frame; // time
+	
+	Textures textures; // struct Textures
 	Level level; // struct Level
 } Game;
 

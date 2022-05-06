@@ -5,12 +5,15 @@
 #include "level.h"
 
 /* Initialization */ 
-void level_init(Level *level) {
+void level_init(Level *level, Textures *textures) {
 	level->frame = 0; // time
 
 	/* Camera */
 	level->camera.x = 0;
 	level->camera.y = 0;
+
+	/* Textures */
+	level->textures = textures;
 
 	/* Player */
 	level->player_onload = 0; // player onload state
@@ -57,12 +60,16 @@ void level_create_map(Level *level) {
 			pos.y = i * TILESIZE;
 
 			/* Create tile */
-			if(WORLD_MAP[i][j] == 1)
+			if(WORLD_MAP[i][j] == 1) {
 				level_create_tile(level, pos, LIGHTGRAY, 1);
+				tile_give_texture(&level->tiles[level->count_tiles - 1], get_texture(level->textures, "rock"));
+			}
 
 			/* Create player */
-			else if(WORLD_MAP[i][j] == 9)
+			else if(WORLD_MAP[i][j] == 9) {
 				level_create_player(level, pos, BLACK, 5);
+				player_give_texture(&level->player, get_texture(level->textures, "player"));
+			}
 		
 		}
 	}
@@ -100,5 +107,10 @@ void level_render(Level *level) {
 	/* Draw player */
 	if(level->player_onload)
 		player_draw(&level->player, level->camera);
+
+}
+
+/* Load layout */
+Layout load_layout(char *path) {
 
 }

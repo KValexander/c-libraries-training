@@ -6,12 +6,16 @@
 
 /* Include files */
 #include "common.h"
+#include "textures.h"
 #include "tile.h"
 
 /* Struct Player */
 typedef struct Player {
 	Rect rect; // x, y, w, h
 	Color color; // color
+
+	int onload_texture; // onload texture
+	MyTexture texture; // texture
 
 	int speed; // movement speed
 	Position direction; // direction
@@ -27,6 +31,9 @@ typedef struct Player {
 
 /* Create player */ 
 extern Player create_player(Rect rect, Color color, int speed, int *count_tiles, Tile *tiles);
+
+/* Give texture */
+extern void player_give_texture(Player *player, MyTexture texture); 
 
 /* Key down */
 extern void player_key_down(Player *player);

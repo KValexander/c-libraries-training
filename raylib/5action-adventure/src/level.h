@@ -3,19 +3,32 @@
 
 /* Constants */
 #define MAX_TILES 1000
+#define MAX_LAYOUTS 10
+#define MAX_ROWS 100
+#define MAX_COLUMNS 100
 
 /* Include libraries */
 #include <raylib.h>
 
 /* Include files */
 #include "common.h"
+#include "textures.h"
 #include "player.h"
 #include "tile.h"
+
+/* Struct layout */
+typedef struct Layout {
+	int rows, columns;
+	int layout[MAX_ROWS][MAX_COLUMNS];
+} Layout;
 
 /* Struct Level */
 typedef struct Level {
 	int frame; // time
 	Position camera; // camera
+
+	/* Textures */
+	Textures *textures;
 
 	/* Player */
 	int player_onload; // player onload state
@@ -24,12 +37,16 @@ typedef struct Level {
 	/* Tiles */ 
 	int count_tiles; // count tiles
 	Tile tiles[MAX_TILES]; // tiles
+
+	/* Layout */
+	int count_layouts; // count layouts
+	Layout layouts[MAX_LAYOUTS]; // layouts
 } Level;
 
 /* Prototypes */
 
 /* Initialization */
-extern void level_init(Level *level);
+extern void level_init(Level *level, Textures *textures);
 
 /* Create tile */ 
 extern void level_create_tile(Level *level, Position pos, Color color, int collision);
@@ -45,5 +62,8 @@ extern void level_update(Level *level);
 
 /* Render */ 
 extern void level_render(Level *level);
+
+/* Load layout */ 
+extern Layout load_layout(char *path);
 
 #endif

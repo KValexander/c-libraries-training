@@ -68,23 +68,23 @@ static int side_collision(float x1, float y1, float x2, float y2, float w1, floa
 	/* TOP */
 	if(x1 + w1 > x2 && x1 < x2 + w2)
 		if(y1 + h1 > y2 && y1 < y2)
-			return 1;
+			side = 1;
 
 	/* BOTTOM */
-	if(x1 + w1 / 2 > x2 && x1 + w1 / 2 < x2 + w2)
+	else if(x1 + w1 / 2 > x2 && x1 + w1 / 2 < x2 + w2)
 		if(y1 < y2 + h2 && y1 > y2)
-			return 3;
+			side = 3;
 
 	/* SIDES */
 	if(y1 + h2 > y2 && y1 < y2 + h2) {
 
 		/* RIGHT */
 		if(x1 < x2 + w2 && x1 + w1 > x2 + w2)
-			return 2;
+			side = 2;
 
 		/* LEFT */
 		else if(x1 + w1 > x2 && x1 < x2)
-			return 4;
+			side = 4;
 
 	}
 
