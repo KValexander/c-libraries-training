@@ -18,6 +18,9 @@ typedef struct Player {
 
 	int *count_tiles; // count tiles
 	Tile *tiles; // tiles
+
+	int current_side; // collision current side
+	int previous_side; // collision previous side
 } Player;
 
 /* Prototypes */

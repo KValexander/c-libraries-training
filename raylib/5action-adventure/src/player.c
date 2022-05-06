@@ -30,6 +30,10 @@ Player create_player(Rect rect, Color color, int speed, int *count_tiles, Tile *
 	player.count_tiles = count_tiles;
 	player.tiles = tiles;
 
+	/* Collision side */
+	player.current_side = 0;
+	player.previous_side = 0;
+
 	/* Return player */
 	return player;
 
@@ -81,72 +85,49 @@ void player_move(Player *player) {
 /* Collision */
 void player_collision(Player *player, int direction) {
 
-	switch(direction) {
+	/* Collision with tiles */
+	for(int i = 0; i < *player->count_tiles; i++) {
+		/* Checking the collision state of a tile */
+		if(!player->tiles[i].collision) return;
 
-		/* HORIZONTAL collision */
-		case 0:
+		/* Check collide with tile */ 
+		if(collide(player->rect.x, player->rect.y, player->tiles[i].rect.x, player->tiles[i].rect.y, player->rect.w, player->rect.h, player->tiles[i].rect.w, player->tiles[i].rect.h )) {
 
-			for(int i = 0; i < *player->count_tiles; i++) {
+			/* Direction */ 
+			switch(direction) {
 
-				/* Check collide */ 
-				if(collide(
-					player->rect.x,
-					player->rect.y,
-					player->tiles[i].rect.x,
-					player->tiles[i].rect.y,
-					player->rect.w,
-					player->rect.h,
-					player->tiles[i].rect.w,
-					player->tiles[i].rect.h
-				)) {
+				/* HORIZONTAL */ 
+				case 0:
 
-					/* RIGHT side */ 
+					/* RIGHT */ 
 					if(player->direction.x > 0)
-						player->rect.x =  player->tiles[i].rect.x - player->rect.w;
+						player->rect.x = player->rect.x - player->speed;
 
-					/* LEFT side */ 
+					/* LEFT */ 
 					else if(player->direction.x < 0)
-						player->rect.x = player->tiles[i].rect.x + player->tiles[i].rect.w;
+						player->rect.x = player->rect.x + player->speed;
 
-				}
+				break;
 
-			}
+				/* VERTICAL */
+				case 1:
 
-		break;
+					/* TOP */ 
+					if(player->direction.y < 0)
+						player->rect.y = player->rect.y + player->speed;
 
-		/* VERTICAL collision */
-		case 1:
+					/* BOTTOM */ 
+					else if(player->direction.y > 0)
+						player->rect.y = player->rect.y - player->speed;
 
-			for(int i = 0; i < *player->count_tiles; i++) {
-
-				/* Check collide */ 
-				if(collide(
-					player->rect.x,
-					player->rect.y,
-					player->tiles[i].rect.x,
-					player->tiles[i].rect.y,
-					player->rect.w,
-					player->rect.h,
-					player->tiles[i].rect.w,
-					player->tiles[i].rect.h
-				)) {
-
-					/* DOWN side */ 
-					if(player->direction.y > 0)
-						player->rect.y = player->tiles[i].rect.y - player->rect.h;
-
-					/* UP side */ 
-					else if(player->direction.y < 0)
-						player->rect.y = player->tiles[i].rect.y + player->tiles[i].rect.h;
-
-				}
+				break;
 
 			}
 
-
-		break;
+		}
 
 	}
+	
 }
 
 
