@@ -1,6 +1,10 @@
 #ifndef COMMON_H_
 #define COMMON_H_
 
+/* Include libraries */
+#include <dirent.h>
+#include <string.h>
+
 /* Common contsants */
 #define WIDTH 	960 // window screen
 #define HEIGHT 	540 // window height
@@ -56,40 +60,26 @@ static int collide(float x1, float y1, float x2, float y2, float w1, float h1, f
     return (!((x1 > (x2+w2)) || (x2 > (x1+w1)) || (y1 > (y2+h2)) || (y2 > (y1+h1))));
 }
 
-/* Side collision
-	1 - top
-	2 - right
-	3 - bottom
-	4 - left
-*/ 
-static int side_collision(float x1, float y1, float x2, float y2, float w1, float h1, float w2, float h2) {
-	int side = 0;
+/* Get filenames from directory */ 
+static int get_filenames_from_dir(char *filenames[30], int n, char *path) {
 
-	/* TOP */
-	if(x1 + w1 > x2 && x1 < x2 + w2)
-		if(y1 + h1 > y2 && y1 < y2)
-			side = 1;
+	/* Open directory */ 
+    struct dirent *dp; // struct dirent
+	DIR *dir = opendir("levels");
+	if(!dir) return 0; // check dir
 
-	/* BOTTOM */
-	else if(x1 + w1 / 2 > x2 && x1 + w1 / 2 < x2 + w2)
-		if(y1 < y2 + h2 && y1 > y2)
-			side = 3;
-
-	/* SIDES */
-	if(y1 + h2 > y2 && y1 < y2 + h2) {
-
-		/* RIGHT */
-		if(x1 < x2 + w2 && x1 + w1 > x2 + w2)
-			side = 2;
-
-		/* LEFT */
-		else if(x1 + w1 > x2 && x1 < x2)
-			side = 4;
-
+	/* Read directory */
+	while((dp = readdir(dir)) != NULL) {
+        if(strcmp(dp->d_name, ".") && strcmp(dp->d_name, "..")) {
+			if(n >= 100) break;
+        	strcpy(filenames[n++], dp->d_name);
+        }
 	}
 
-	/* Return side */
-	return side; 
+	/* Close directory */
+	closedir(dir);
+
+	return n;
 }
 
 #endif

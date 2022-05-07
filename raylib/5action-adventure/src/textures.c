@@ -79,7 +79,6 @@ void unload_textures(Textures *textures) {
     unload_texture(textures, "object19");
     unload_texture(textures, "object20");
 
-
 }
 
 

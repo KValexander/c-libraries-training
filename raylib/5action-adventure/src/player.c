@@ -112,11 +112,11 @@ void player_collision(Player *player, int direction) {
 
 					/* RIGHT */ 
 					if(player->direction.x > 0)
-						player->rect.x = player->rect.x - player->speed;
+						player->rect.x -= player->speed;
 
 					/* LEFT */ 
 					else if(player->direction.x < 0)
-						player->rect.x = player->rect.x + player->speed;
+						player->rect.x += player->speed;
 
 				break;
 
@@ -125,11 +125,11 @@ void player_collision(Player *player, int direction) {
 
 					/* TOP */ 
 					if(player->direction.y < 0)
-						player->rect.y = player->rect.y + player->speed;
+						player->rect.y += player->speed;
 
 					/* BOTTOM */ 
 					else if(player->direction.y > 0)
-						player->rect.y = player->rect.y - player->speed;
+						player->rect.y -= player->speed;
 
 				break;
 

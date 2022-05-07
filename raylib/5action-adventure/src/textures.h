@@ -13,7 +13,7 @@
 /* Struct MyTexture */
 typedef struct MyTexture {
 	char name[255];
-	int w, h;
+	int id, w, h;
 	Texture2D texture;
 } MyTexture;
 

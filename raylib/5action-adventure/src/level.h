@@ -18,6 +18,7 @@
 
 /* Struct layout */
 typedef struct Layout {
+	char name[255];
 	int rows, columns;
 	int layout[MAX_ROWS][MAX_COLUMNS];
 } Layout;
@@ -63,7 +64,10 @@ extern void level_update(Level *level);
 /* Render */ 
 extern void level_render(Level *level);
 
+/* Create layout */
+extern void create_layout(Level *level, char *name, char *path); 
+
 /* Load layout */ 
-extern Layout load_layout(char *path);
+extern Layout load_layout(char *name, char *path);
 
 #endif

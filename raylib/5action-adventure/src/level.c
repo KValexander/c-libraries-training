@@ -1,5 +1,7 @@
 /* Include libraries */
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* Include files */
 #include "level.h"
@@ -50,6 +52,11 @@ void level_create_player(Level *level, Position pos, Color color, int speed) {
 /* Create map */
 void level_create_map(Level *level) {
 	Position pos; // tile position
+
+	/* Create layouts */
+	create_layout(level, "boundary", "assets/map/map_FloorBlocks.csv");
+	create_layout(level, "grass", "assets/map/map_Grass.csv");
+	create_layout(level, "object", "assets/map/map_Objects.csv");
 
 	/* Create map */
 	for(int i = 0; i < ROWS; i++) { // row
@@ -110,7 +117,59 @@ void level_render(Level *level) {
 
 }
 
-/* Load layout */
-Layout load_layout(char *path) {
+/* Create layout */
+void create_layout(Level *level, char *name, char *path) {
+	if(level->count_layouts >= MAX_LAYOUTS) return;
+	level->layouts[level->count_layouts++] = load_layout(name, path);
+}
+
+/* Load layout from file */
+Layout load_layout(char *name, char *path) {
+
+	/* Create layout */
+	Layout layout;
+
+	/* Naming */ 
+	strcpy(layout.name, name);
+
+	/* Rows and Columns */ 
+	layout.rows = 0;
+	layout.columns = 0;
+
+	/* Open file */
+	FILE *file = fopen(path, "r");
+	char buffer[255]; // buffer
+	char *istr; // separator
+
+	/* Read file */
+	while(fgets(buffer, 255, file) != NULL) {
+		if(layout.rows >= MAX_ROWS) break;
+
+		/* Line splitting */
+		istr = strtok(buffer, ",");
+		layout.columns = 0;
+
+		/* Processing parts of a string */
+		while(istr != NULL) {
+			if(layout.columns >= MAX_COLUMNS) break;
+			// printf("%d - %s\n", layout.columns, istr);
+
+			/* Adding a number to an array */
+			layout.layout[layout.rows][layout.columns++] = atoi(istr);
+
+			/* Get the next part of the string */
+			istr = strtok(NULL, ",");
+		}
+
+		layout.rows++;
+	}
+
+	/* Close file */ 
+	fclose(file);
+
+	printf("%s - %d - %d \n", layout.name, layout.rows, layout.columns);
+
+	/* Return layout */
+	return layout;
 
 }
