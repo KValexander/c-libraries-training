@@ -173,4 +173,13 @@ void player_draw(Player *player, Position camera) {
 			player->rect.h,
 			player->color
 		);
+
+	/* Draw hitbox */
+	DrawRectangleLines(
+		camera.x + player->rect.x,
+		camera.y + player->rect.y,
+		player->rect.w,
+		player->rect.h,
+		RED
+	);
 }

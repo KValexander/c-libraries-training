@@ -17,6 +17,9 @@ void level_init(Level *level, Textures *textures) {
 	/* Textures */
 	level->textures = textures;
 
+	/* Map */
+	level->map = get_texture(level->textures, "map");
+
 	/* Player */
 	level->player_onload = 0; // player onload state
 	
@@ -51,6 +54,7 @@ void level_create_player(Level *level, Position pos, Color color, int speed) {
 
 /* Create map */
 void level_create_map(Level *level) {
+	char concat[30]; // string to concatenate
 	Position pos; // tile position
 
 	/* Create layouts */
@@ -58,28 +62,39 @@ void level_create_map(Level *level) {
 	create_layout(level, "grass", "assets/map/map_Grass.csv");
 	create_layout(level, "object", "assets/map/map_Objects.csv");
 
-	/* Create map */
-	for(int i = 0; i < ROWS; i++) { // row
-		for(int j = 0; j < COLUMNS; j++) { // column
+	/* Create map from layouts */
+	for(int l = 0; l < level->count_layouts; l++) {
+		Layout *layout = &level->layouts[l];
 
-			/* Tile position */ 
-			pos.x = j * TILESIZE;
-			pos.y = i * TILESIZE;
+		/* Create layer */
+		for(int i = 0; i < layout->rows; i++) {
+			for(int j = 0; j < layout->columns; j++) {
+				/* Checking for the absence of a tile */ 
+				if(layout->layout[i][j] != -1) {
 
-			/* Create tile */
-			if(WORLD_MAP[i][j] == 1) {
-				level_create_tile(level, pos, LIGHTGRAY, 1);
-				tile_give_texture(&level->tiles[level->count_tiles - 1], get_texture(level->textures, "rock"));
+					/* Tile rect */
+					pos.x = j * TILESIZE;
+					pos.y = i * TILESIZE;
+
+					/* Boundary */
+					if(!strcmp(layout->name, "boundary"))
+						level_create_tile(level, pos, BLANK, 1);
+
+					/* Grass and Object */
+					else {
+						level_create_tile(level, pos, WHITE, 1);
+						tile_give_texture(&level->tiles[level->count_tiles - 1], get_texture_by_id(level->textures, layout->layout[i][j]));
+					}
+
+				}
 			}
-
-			/* Create player */
-			else if(WORLD_MAP[i][j] == 9) {
-				level_create_player(level, pos, BLACK, 5);
-				player_give_texture(&level->player, get_texture(level->textures, "player"));
-			}
-		
 		}
-	}
+
+	} 
+
+	/* Create player */ 
+	level_create_player(level, (Position) { 2000, 1430 }, BLACK, 5);
+	player_give_texture(&level->player, get_texture(level->textures, "player"));
 
 }
 
@@ -106,6 +121,9 @@ void level_update(Level *level) {
 
 /* Level render */
 void level_render(Level *level) {
+
+	/* Draw map */
+	DrawTexture(level->map.texture, level->camera.x, level->camera.y, WHITE);
 
 	/* Draw tiles */
 	for(int i = 0; i < level->count_tiles; i++)

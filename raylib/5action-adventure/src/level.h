@@ -31,6 +31,9 @@ typedef struct Level {
 	/* Textures */
 	Textures *textures;
 
+	/* Map */
+	MyTexture map;
+
 	/* Player */
 	int player_onload; // player onload state
 	Player player; // player

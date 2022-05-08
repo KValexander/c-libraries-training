@@ -39,6 +39,8 @@ void tile_give_texture(Tile *tile, MyTexture texture) {
 	tile->onload_texture = 1;
 	tile->rect.w = tile->texture.w;
 	tile->rect.h = tile->texture.h;
+	tile->hitbox.w = tile->rect.w - 10;
+	tile->hitbox.h = tile->rect.h - 40;
 } 
 
 /* Draw tile */
@@ -60,5 +62,14 @@ void tile_draw(Tile *tile, Position camera) {
 		tile->rect.w,
 		tile->rect.h,
 		tile->color
+	);
+
+	/* Draw hitbox */
+	DrawRectangleLines(
+		camera.x + tile->hitbox.x,
+		camera.y + tile->hitbox.y,
+		tile->hitbox.w,
+		tile->hitbox.h,
+		GREEN
 	);
 }
