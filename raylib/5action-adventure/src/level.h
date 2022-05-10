@@ -53,7 +53,7 @@ typedef struct Level {
 extern void level_init(Level *level, Textures *textures);
 
 /* Create tile */ 
-extern void level_create_tile(Level *level, Position pos, Color color, int collision);
+extern void level_create_tile(Level *level, Position pos, Color color, int collision, int type);
 
 /* Create player */ 
 extern void level_create_player(Level *level, Position pos, Color color, int speed);

@@ -5,12 +5,13 @@
 #include "tile.h"
 
 /* Create tile */
-Tile create_tile(Rect rect, Color color, int collision) {
+Tile create_tile(Rect rect, Color color, int collision, int type) {
 
 	/* Create tile */
 	Tile tile;
 
 	/* Rect */
+	if(type == 1) rect.y -= TILESIZE;
 	tile.rect = rect;
 
 	/* Hitbox */

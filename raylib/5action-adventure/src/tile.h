@@ -18,12 +18,17 @@ typedef struct Tile {
 	MyTexture texture; // texture
 
 	int collision; // collision state
+	/*
+		0 - boundary
+		1 - object
+	*/ 
+	int type; // tile type
 } Tile;
 
 /* Prototypes */
 
 /* Create tile */ 
-extern Tile create_tile(Rect rect, Color color, int collision);
+extern Tile create_tile(Rect rect, Color color, int collision, int type);
 
 /* Give texture */ 
 extern void tile_give_texture(Tile *tile, MyTexture texture);

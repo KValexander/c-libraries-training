@@ -14,10 +14,21 @@ Player create_player(Rect rect, Color color, int speed, int *count_tiles, Tile *
 	player.rect = rect;
 
 	/* Color */
-	player.color = color; 
+	player.color = color;
+
+	/* Status
+		0 - UP,
+		1 - RIGHT,
+		2 - DOWN,
+		3 - LEFT
+	*/
+	player.status = 0; 
 
 	/* Onload texture */
-	player.onload_texture = 0; 
+	player.onload_texture = 0;
+
+	/* Animation state */
+	player.animation_state = 0;
 
 	/* Speed */
 	player.speed = speed;
@@ -43,40 +54,107 @@ Player create_player(Rect rect, Color color, int speed, int *count_tiles, Tile *
 }
 
 /* Give texture */
-void player_give_texture(Player *player, MyTexture texture) {
+void player_give_texture(Player *player, MyTexture texture, int animation_state) {
+	
+	/* Texture */ 
 	player->texture = texture;
+	
+	/* Onload texture state */ 
 	player->onload_texture = 1;
-	player->rect.w = player->texture.w;
-	player->rect.h = player->texture.h;
+
+	/* Animation state */
+	player->animation_state = animation_state;
+
+	/* Animation */
+	if(player->animation_state) {
+
+		/* Number of animation frames */
+		player->animation.x = 3;
+		player->animation.y = 3;
+
+		/* Current frame */
+		player->frame.x = 0; // x
+		player->frame.y = 0; // y
+
+		/* Single frame size */ 
+		player->frame.w = player->rect.w;
+		player->frame.h = player->rect.h;
+
+
+	/* Player size */ 
+	} else {
+		player->rect.w = player->texture.w;
+		player->rect.h = player->texture.h;
+	}
+	
 }
+
+/* Set status */
+void player_set_status(Player *player, int status) {
+	switch(status) {
+
+		/* UP */
+		case 0:
+			player->status = 0;
+			player->frame.y = 3;
+		break;
+
+		/* RIGHT */
+		case 1:
+			player->status = 1;
+			player->frame.y = 2;
+		break;
+
+		/* DOWN */
+		case 2:
+			player->status = 2;
+			player->frame.y = 0;
+		break;
+
+		/* LEFT */
+		case 3:
+			player->status = 3;
+			player->frame.y = 1;
+		break;
+
+	}
+} 
 
 /* Key down */
 void player_key_down(Player *player) {
 
-	/* HORIZONTAL */ 
-	/* RIGHT */
-	if(IsKeyDown(KEY_RIGHT))
-		player->direction.x = 1;
-
-	/* LEFT */ 
-	else if(IsKeyDown(KEY_LEFT))
-		player->direction.x = -1;
-
-	/* STOP */ 
-	else player->direction.x = 0;
-	
-
 	/* VERTICAL */
 	/* DOWN */
-	if (IsKeyDown(KEY_DOWN))
+	if (IsKeyDown(KEY_DOWN)) {
 		player->direction.y = 1;
+		player_set_status(player, 2);
+	}
 
 	/* UP */ 
-	else if(IsKeyDown(KEY_UP))
+	else if(IsKeyDown(KEY_UP)) {
 		player->direction.y = -1;
+		player_set_status(player, 0);
+	}
 
 	/* STOP */ 
 	else player->direction.y = 0;
+
+
+	/* HORIZONTAL */ 
+	/* RIGHT */
+	if(IsKeyDown(KEY_RIGHT)) {
+		player->direction.x = 1;
+		player_set_status(player, 1);
+	}
+
+	/* LEFT */ 
+	else if(IsKeyDown(KEY_LEFT)) {
+		player->direction.x = -1;
+		player_set_status(player, 3);
+	}
+
+	/* STOP */ 
+	else player->direction.x = 0;
 
 }
 
@@ -143,27 +221,58 @@ void player_collision(Player *player, int direction) {
 
 
 /* Update */
-void player_update(Player *player) {
+void player_update(Player *player, int time) {
 
 	/* Key down */
 	player_key_down(player);
+
+	/* Player animation */
+	player_animation(player, time);
 
 	/* Move */
 	player_move(player);
 
 }
 
+/* Animation */
+void player_animation(Player *player, int time) {
+	if(!player->direction.x && !player->direction.y)
+		player->frame.x = 1;
+	else if(time % 10 == 0)
+		player->frame.x = (player->frame.x >= player->animation.x - 1) ? 0 : ++player->frame.x;
+} 
+
 /* Draw */
 void player_draw(Player *player, Position camera) {
 
-	/* Draw texture */
-	if(player->onload_texture)
-		DrawTexture(
-			player->texture.texture,
-			camera.x + player->rect.x,
-			camera.y + player->rect.y,
-			WHITE
-		);
+	/* Onload texture */
+	if(player->onload_texture) {
+
+		/* Draw part of the texture */ 
+		if(player->animation_state)
+			DrawTextureRec(
+				player->texture.texture,
+				(Rectangle) {
+					player->frame.w * player->frame.x,
+					player->frame.h * player->frame.y,
+					player->frame.w,
+					player->frame.h
+				},
+				(Vector2) {
+					camera.x + player->rect.x,
+					camera.y + player->rect.y,
+				},
+				WHITE
+			);
+
+		/* Draw texture */
+		else DrawTexture(
+				player->texture.texture,
+				camera.x + player->rect.x,
+				camera.y + player->rect.y,
+				WHITE
+			);
+	}
 
 	/* Draw rectangle */
 	else DrawRectangle(

@@ -32,12 +32,13 @@ void level_init(Level *level, Textures *textures) {
 }
 
 /* Create tile */
-void level_create_tile(Level *level, Position pos, Color color, int collision) {
+void level_create_tile(Level *level, Position pos, Color color, int collision, int type) {
 	if(level->count_tiles >= MAX_TILES) return;
 	level->tiles[level->count_tiles++] = create_tile(
 		(Rect) { pos.x, pos.y, TILESIZE, TILESIZE },
 		color,
-		collision
+		collision,
+		type
 	);
 }
 
@@ -78,11 +79,17 @@ void level_create_map(Level *level) {
 
 					/* Boundary */
 					if(!strcmp(layout->name, "boundary"))
-						level_create_tile(level, pos, BLANK, 1);
+						level_create_tile(level, pos, BLANK, 1, 0);
 
-					/* Grass and Object */
-					else {
-						level_create_tile(level, pos, WHITE, 1);
+					/* Grass */ 
+					else if(!strcmp(layout->name, "grass")) {
+						level_create_tile(level, pos, WHITE, 1, 0);
+						tile_give_texture(&level->tiles[level->count_tiles - 1], get_texture_by_id(level->textures, layout->layout[i][j]));
+					}
+
+					/* Object */
+					else if(!strcmp(layout->name, "object")) {
+						level_create_tile(level, pos, WHITE, 1, 1);
 						tile_give_texture(&level->tiles[level->count_tiles - 1], get_texture_by_id(level->textures, layout->layout[i][j]));
 					}
 
@@ -94,7 +101,7 @@ void level_create_map(Level *level) {
 
 	/* Create player */ 
 	level_create_player(level, (Position) { 2000, 1430 }, BLACK, 5);
-	player_give_texture(&level->player, get_texture(level->textures, "player"));
+	player_give_texture(&level->player, get_texture(level->textures, "player"), 1);
 
 }
 
@@ -112,7 +119,7 @@ void level_update(Level *level) {
 
 	/* Player update */
 	if(level->player_onload)
-		player_update(&level->player);
+		player_update(&level->player, level->frame);
 
 	/* Camera update */
 	camera_update(&level->camera, &level->player.rect);
@@ -170,7 +177,6 @@ Layout load_layout(char *name, char *path) {
 		/* Processing parts of a string */
 		while(istr != NULL) {
 			if(layout.columns >= MAX_COLUMNS) break;
-			// printf("%d - %s\n", layout.columns, istr);
 
 			/* Adding a number to an array */
 			layout.layout[layout.rows][layout.columns++] = atoi(istr);
@@ -184,8 +190,6 @@ Layout load_layout(char *name, char *path) {
 
 	/* Close file */ 
 	fclose(file);
-
-	printf("%s - %d - %d \n", layout.name, layout.rows, layout.columns);
 
 	/* Return layout */
 	return layout;

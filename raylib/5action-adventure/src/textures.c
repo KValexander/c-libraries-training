@@ -14,8 +14,7 @@ void load_textures(Textures *textures) {
     create_texture(textures, "map", -1, "assets/graphics/tilemap/ground.png");
 
     /* Create texture player */
-    create_texture(textures, "player", -1, "assets/graphics/test/player.png");
-    create_texture(textures, "rock", -1, "assets/graphics/test/rock.png");
+    create_texture(textures, "player", -1, "assets/graphics/player/player.png");
 
     /* Create texture grass */ 
     create_texture(textures, "grass0", 21, "assets/graphics/grass/grass_1.png");
